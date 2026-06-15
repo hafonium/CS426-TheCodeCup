@@ -1,5 +1,7 @@
 package com.example.thecodecup.ui.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +24,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LocalContentColor // <-- Added import
+import androidx.compose.runtime.CompositionLocalProvider // <-- Added import
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +44,7 @@ fun Button(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = ButtonShape,
+    border: BorderStroke? = null,
     backgroundGradient: List<Color> = listOf(LightBrown, DarkBrown),
     disabledBackgroundGradient: List<Color> = listOf(Gray, White),
     contentColor: Color = Color.White,
@@ -47,8 +52,11 @@ fun Button(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit,
 ) {
+    val targetContentColor = if (enabled) contentColor else disabledContentColor
+
     Box(
         modifier = modifier
+            .then(if (border != null) Modifier.border(border, shape) else Modifier)
             .clip(shape)
             .background(
                 Brush.horizontalGradient(
@@ -60,35 +68,34 @@ fun Button(
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
-                indication = null,
+                indication = ripple(),
             ),
         contentAlignment = Alignment.Center
     ) {
-        ProvideTextStyle(
-            value = MaterialTheme.typography.labelLarge,
-        ) {
-            Row(
-                Modifier
-                    .defaultMinSize(
-                        minWidth = ButtonDefaults.MinWidth,
-                        minHeight = ButtonDefaults.MinHeight,
-                    )
-                    .indication(interactionSource, ripple())
-                    .padding(contentPadding),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                content = content,
-            )
+        CompositionLocalProvider(LocalContentColor provides targetContentColor) {
+            ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {
+                Row(
+                    Modifier
+                        .defaultMinSize(
+                            minWidth = ButtonDefaults.MinWidth,
+                            minHeight = ButtonDefaults.MinHeight,
+                        )
+                        .padding(contentPadding),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = content
+                )
+            }
         }
     }
 }
 
-private val ButtonShape = RoundedCornerShape(percent = 50)
+val ButtonShape = RoundedCornerShape(percent = 50)
 
 @Preview("Button Preview")
 @Composable
 private fun CodeCupButtonPreview() {
-    TheCodeCupTheme() {
+    TheCodeCupTheme {
         Button(onClick = {}) {
             Text(text = "Add to cart")
         }
