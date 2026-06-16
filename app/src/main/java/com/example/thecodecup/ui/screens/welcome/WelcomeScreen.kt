@@ -1,9 +1,7 @@
 package com.example.thecodecup.ui.screens.welcome
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,10 +12,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.thecodecup.ui.components.Button
-import com.example.thecodecup.ui.theme.TheCodeCupTheme
+import com.example.thecodecup.ui.components.buttons.Button
 import com.example.thecodecup.ui.theme.White
 import com.example.thecodecup.utils.ScreenWrapper
 
@@ -49,7 +47,11 @@ fun WelcomeScreen(
             backgroundGradient = listOf(White, White),
             shape = buttonShape,
         ) {
-            Text(text = "Login")
+            Text(
+                text = "Login",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
         }
 
         Button(
@@ -62,7 +64,11 @@ fun WelcomeScreen(
             ),
             shape = buttonShape,
         ) {
-            Text(text = "Register")
+            Text(
+                text = "Register",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
