@@ -1,20 +1,16 @@
-package com.example.thecodecup.ui.components
+package com.example.thecodecup.ui.components.buttons
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,6 +27,7 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.thecodecup.ui.components.Surface
 import com.example.thecodecup.ui.theme.DarkBrown
 import com.example.thecodecup.ui.theme.Gray
 import com.example.thecodecup.ui.theme.LightBrown
@@ -54,9 +51,12 @@ fun Button(
 ) {
     val targetContentColor = if (enabled) contentColor else disabledContentColor
 
-    Box(
+    Surface(
+        shape = shape,
+        color = Color.Transparent,
+        contentColor = targetContentColor,
+        border = border,
         modifier = modifier
-            .then(if (border != null) Modifier.border(border, shape) else Modifier)
             .clip(shape)
             .background(
                 Brush.horizontalGradient(
@@ -68,9 +68,8 @@ fun Button(
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
-                indication = ripple(),
-            ),
-        contentAlignment = Alignment.Center
+                indication = null,
+            )
     ) {
         CompositionLocalProvider(LocalContentColor provides targetContentColor) {
             ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {

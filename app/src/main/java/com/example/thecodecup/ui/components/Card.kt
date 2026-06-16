@@ -21,24 +21,21 @@ import com.example.thecodecup.ui.theme.TheCodeCupTheme
 fun Card(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
+    color: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
     border: BorderStroke? = null,
     elevation: Dp = 4.dp,
     content: @Composable () -> Unit,
 ) {
-    Card(
+    Surface(
         modifier = modifier,
         shape = shape,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        ),
+        color = color,
+        contentColor = contentColor,
+        elevation = elevation,
         border = border,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = elevation
-        )
-    ) {
-        content()
-    }
+        content = content,
+    )
 }
 
 @Preview("default")
