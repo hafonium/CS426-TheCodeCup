@@ -1,25 +1,17 @@
-package com.example.thecodecup.ui.screens.login
+package com.example.thecodecup.ui.screens.register
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,13 +27,12 @@ import com.example.thecodecup.ui.components.CustomTextField
 import com.example.thecodecup.ui.components.buttons.BackButton
 import com.example.thecodecup.ui.components.buttons.Button
 import com.example.thecodecup.ui.theme.White
-import com.example.thecodecup.utils.ScreenWrapper
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     modifier: Modifier = Modifier,
     onNavigateToWelcome : () -> Unit = { },
-    onNavigateToRegister : () -> Unit = { }
+    onNavigateToLogin : () -> Unit = { }
 ) {
     val buttonShape = RoundedCornerShape(percent = 15)
     Column(
@@ -62,7 +53,7 @@ fun LoginScreen(
         )
 
         Text(
-            text = "Welcome back! Glad to see you, Again!",
+            text = "Hello! Register to get started",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier
                 .padding(top = 32.dp)
@@ -70,6 +61,27 @@ fun LoginScreen(
 
         )
 
+        var nameText by remember { mutableStateOf("") }
+        CustomTextField(
+            value = nameText,
+            onValueChange = { nameText = it },
+            placeholderText = "Enter your full name",
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        )
+
+        var phoneText by remember { mutableStateOf("") }
+        CustomTextField(
+            value = phoneText,
+            onValueChange = { phoneText = it },
+            placeholderText = "Enter your phone number",
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        )
 
         var emailText by remember { mutableStateOf("") }
         CustomTextField(
@@ -94,15 +106,16 @@ fun LoginScreen(
                 .padding(bottom = 8.dp)
         )
 
-        Text(
-            text = "Forgot your password?",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
+        var passwordText2 by remember { mutableStateOf("") }
+        CustomTextField(
+            value = passwordText2,
+            onValueChange = { passwordText2 = it },
+            placeholderText = "Enter your password again",
+            canToggleVisibility = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier
-                .clickable {
-                    // Handle forgot password logic here
-                }
-                .align(Alignment.End)
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
         )
 
         Button(
@@ -111,7 +124,6 @@ fun LoginScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
                 .padding(bottom = 16.dp)
                 .border(
                     width = 2.dp,
@@ -122,30 +134,27 @@ fun LoginScreen(
             shape = buttonShape,
         ) {
             Text(
-                text = "Login",
+                text = "Register",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
         }
 
         Text(
-            text = "Don't have an account? Sign up",
+            text = "Already have an account? Login now",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .clickable {
-                    onNavigateToRegister()
+                    onNavigateToLogin()
                 }
                 .align(Alignment.CenterHorizontally)
         )
     }
 }
 
-@Preview("default", showBackground = true)
-@Preview("dark theme", showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
-    ScreenWrapper {
-        LoginScreen(onNavigateToWelcome = {  })
-    }
+fun RegisterScreenPreview() {
+    RegisterScreen()
 }

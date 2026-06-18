@@ -22,7 +22,8 @@ import com.example.thecodecup.utils.ScreenWrapper
 @Composable
 fun WelcomeScreen(
     modifier: Modifier = Modifier,
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    onNavigateToRegister: () -> Unit
 ) {
     val buttonShape = RoundedCornerShape(percent = 15)
     Column(
@@ -55,7 +56,10 @@ fun WelcomeScreen(
         }
 
         Button(
-            onClick = {},
+            onClick = {
+                // Navigate to RegisterScreen
+                onNavigateToRegister()
+            },
             modifier = Modifier
                 .fillMaxWidth(),
             backgroundGradient = listOf(
@@ -78,6 +82,9 @@ fun WelcomeScreen(
 @Composable
 fun WelcomeScreenPreview() {
     ScreenWrapper {
-        WelcomeScreen(onNavigateToLogin = {})
+        WelcomeScreen(
+            onNavigateToLogin = { },
+            onNavigateToRegister = { }
+        )
     }
 }
