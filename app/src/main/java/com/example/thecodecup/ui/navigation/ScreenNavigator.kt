@@ -1,15 +1,24 @@
-package com.example.thecodecup.ui.screens
+package com.example.thecodecup.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.thecodecup.ui.screens.home.HomeScreen
-import com.example.thecodecup.ui.screens.login.LoginScreen
-import com.example.thecodecup.ui.screens.profile.ProfileScreen
-import com.example.thecodecup.ui.screens.register.RegisterScreen
-import com.example.thecodecup.ui.screens.welcome.WelcomeScreen
+import com.example.thecodecup.data.local.AppDatabase
+import com.example.thecodecup.data.local.AppDatabase.Companion.getDatabase
+import com.example.thecodecup.data.repository.UserRepositoryImpl
+import com.example.thecodecup.domain.usecase.account.RegisterUseCase
+import com.example.thecodecup.ui.core.home.HomeScreen
+import com.example.thecodecup.ui.auth.login.LoginScreen
+import com.example.thecodecup.ui.core.profile.ProfileScreen
+import com.example.thecodecup.ui.auth.register.RegisterScreen
+import com.example.thecodecup.ui.auth.register.RegisterViewModel
+import com.example.thecodecup.ui.auth.welcome.WelcomeScreen
 
 @Composable
 fun ScreenNavigator(
@@ -40,7 +49,21 @@ fun ScreenNavigator(
         }
 
         composable(route = Screen.Register.route) {
+            val context = LocalContext.current
+            val registerViewModelFactory = viewModelFactory {
+                initializer {
+                    val userDao = getDatabase(context).userDao()
+                    val repository = UserRepositoryImpl(userDao)
+                    val useCase = RegisterUseCase(repository)
+
+                    RegisterViewModel(useCase)
+                }
+            }
+
+            val registerViewModel: RegisterViewModel = viewModel(factory = registerViewModelFactory)
+
             RegisterScreen(
+                viewModel = registerViewModel,
                 onNavigateToWelcome = onNavigateToWelcome,
                 onNavigateToLogin = { navController.navigate(Screen.Login.route) }
             )

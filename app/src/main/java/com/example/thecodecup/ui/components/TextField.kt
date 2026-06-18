@@ -2,6 +2,7 @@ package com.example.thecodecup.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,7 +23,8 @@ fun CustomTextField(
     placeholderText: String,
     modifier: Modifier = Modifier,
     canToggleVisibility: Boolean = false,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -31,6 +33,7 @@ fun CustomTextField(
         onValueChange = onValueChange,
         placeholder = { Text(placeholderText, color = Color.Gray) },
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
 
         visualTransformation = if (canToggleVisibility && !passwordVisible) {
             PasswordVisualTransformation()

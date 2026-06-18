@@ -1,4 +1,4 @@
-package com.example.thecodecup.ui.screens.welcome
+package com.example.thecodecup.ui.auth.welcome
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement

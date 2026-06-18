@@ -1,4 +1,4 @@
-package com.example.thecodecup.ui.screens.profile
+package com.example.thecodecup.ui.core.profile
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box

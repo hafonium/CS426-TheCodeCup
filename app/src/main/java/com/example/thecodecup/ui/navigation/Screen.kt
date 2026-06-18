@@ -1,4 +1,4 @@
-package com.example.thecodecup.ui.screens
+package com.example.thecodecup.ui.navigation
 
 sealed class Screen(val route: String) {
     object Welcome : Screen("welcome_screen")
