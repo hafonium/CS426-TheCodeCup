@@ -7,6 +7,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.thecodecup.utils.ScreenWrapper
+
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel,
@@ -37,7 +39,7 @@ fun RegisterScreen(
 @Preview(showBackground = true, name = "Idle State")
 @Composable
 fun RegisterScreenPreview_Idle() {
-    MaterialTheme {
+    ScreenWrapper {
         RegisterScreenContent(
             uiState = RegisterUiState.Idle,
             onRegisterClicked = { _, _, _, _, _ -> },
@@ -50,7 +52,7 @@ fun RegisterScreenPreview_Idle() {
 @Preview(showBackground = true, name = "Loading State")
 @Composable
 fun RegisterScreenPreview_Loading() {
-    MaterialTheme {
+    ScreenWrapper {
         RegisterScreenContent(
             uiState = RegisterUiState.Loading,
             onRegisterClicked = { _, _, _, _, _ -> },
@@ -63,7 +65,7 @@ fun RegisterScreenPreview_Loading() {
 @Preview(showBackground = true, name = "Error State")
 @Composable
 fun RegisterScreenPreview_Error() {
-    MaterialTheme {
+    ScreenWrapper {
         RegisterScreenContent(
             uiState = RegisterUiState.Error("Passwords do not match"),
             onRegisterClicked = { _, _, _, _, _ -> },

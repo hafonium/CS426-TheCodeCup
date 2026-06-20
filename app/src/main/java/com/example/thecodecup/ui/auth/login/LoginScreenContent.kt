@@ -1,6 +1,5 @@
-package com.example.thecodecup.ui.auth.register
+package com.example.thecodecup.ui.auth.login
 
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -29,40 +28,33 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.thecodecup.ui.auth.register.RegisterUiState
 import com.example.thecodecup.ui.components.CustomTextField
 import com.example.thecodecup.ui.components.buttons.BackButton
 import com.example.thecodecup.ui.components.buttons.Button
 import com.example.thecodecup.ui.theme.White
 
 @Composable
-fun RegisterScreenContent(
-    uiState: RegisterUiState,
-    onRegisterClicked: (String, String, String, String, String) -> Unit,
+fun LoginScreenContent(
+    uiState: LoginUiState,
+    onLoginClicked: (String, String) -> Unit,
     onNavigateToWelcome: () -> Unit,
-    onNavigateToLogin: () -> Unit,
+    onNavigateToRegister: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val buttonShape = RoundedCornerShape(percent = 15)
     val focusManager = LocalFocusManager.current
-    var nameText by remember { mutableStateOf("") }
-    var phoneText by remember { mutableStateOf("") }
     var emailText by remember { mutableStateOf("") }
     var passwordText by remember { mutableStateOf("") }
-    var confirmPasswordText by remember { mutableStateOf("") }
-    val isFormComplete = nameText.isNotBlank() &&
-            phoneText.isNotBlank() &&
-            emailText.isNotBlank() &&
-            passwordText.isNotBlank() &&
-            confirmPasswordText.isNotBlank()
-
+    val isFormComplete = emailText.isNotBlank() && passwordText.isNotBlank()
     val imeAction = if (isFormComplete) ImeAction.Done else ImeAction.Next
     val keyboardActions = if (isFormComplete) {
         KeyboardActions(
             onDone = {
                 focusManager.clearFocus() // Closes the keyboard
                 // Trigger the registration!
-                if (uiState !is RegisterUiState.Loading) {
-                    onRegisterClicked(nameText, emailText, phoneText, passwordText, confirmPasswordText)
+                if (uiState !is LoginUiState.Loading) {
+                    onLoginClicked(emailText, passwordText)
                 }
             }
         )
@@ -92,47 +84,27 @@ fun RegisterScreenContent(
         )
 
         Text(
-            text = "Hello! Register to get started",
+            text = "Welcome back! Glad to see you, Again!",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier
                 .padding(top = 32.dp)
                 .padding(bottom = 24.dp)
+
         )
 
-        CustomTextField(
-            value = nameText,
-            onValueChange = { nameText = it },
-            placeholderText = "Enter your full name",
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = imeAction
-            ),
-            keyboardActions = keyboardActions,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-        )
-
-        CustomTextField(
-            value = phoneText,
-            onValueChange = { phoneText = it },
-            placeholderText = "Enter your phone number",
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Phone,
-                imeAction = imeAction
-            ),
-            keyboardActions = keyboardActions,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-        )
 
         CustomTextField(
             value = emailText,
             onValueChange = { emailText = it },
             placeholderText = "Enter your email",
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
+                keyboardType = KeyboardType.Email,
                 imeAction = imeAction
             ),
             keyboardActions = keyboardActions,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
 
         CustomTextField(
@@ -145,23 +117,23 @@ fun RegisterScreenContent(
                 imeAction = imeAction
             ),
             keyboardActions = keyboardActions,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
         )
 
-        CustomTextField(
-            value = confirmPasswordText,
-            onValueChange = { confirmPasswordText = it },
-            placeholderText = "Enter your password again",
-            canToggleVisibility = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = imeAction
-            ),
-            keyboardActions = keyboardActions,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+        Text(
+            text = "Forgot your password?",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .clickable {
+                    // Handle forgot password logic here
+                }
+                .align(Alignment.End)
         )
 
-        if (uiState is RegisterUiState.Error) {
+        if (uiState is LoginUiState.Error) {
             Text(
                 text = uiState.message,
                 color = MaterialTheme.colorScheme.error,
@@ -174,12 +146,13 @@ fun RegisterScreenContent(
 
         Button(
             onClick = {
-                if (uiState !is RegisterUiState.Loading) {
-                    onRegisterClicked(nameText, emailText, phoneText, passwordText, confirmPasswordText)
+                if (uiState !is LoginUiState.Loading) {
+                    onLoginClicked(emailText, passwordText)
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(top = 16.dp)
                 .padding(bottom = 16.dp)
                 .border(
                     width = 2.dp,
@@ -189,7 +162,7 @@ fun RegisterScreenContent(
             backgroundGradient = listOf(White, White),
             shape = buttonShape,
         ) {
-            if (uiState is RegisterUiState.Loading) {
+            if (uiState is LoginUiState.Loading) {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
@@ -202,7 +175,7 @@ fun RegisterScreenContent(
                 }
             } else {
                 Text(
-                    text = "Register",
+                    text = "Login",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
@@ -210,12 +183,12 @@ fun RegisterScreenContent(
         }
 
         Text(
-            text = "Already have an account? Login now",
+            text = "Don't have an account? Sign up",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .clickable {
-                    onNavigateToLogin()
+                    onNavigateToRegister()
                 }
                 .align(Alignment.CenterHorizontally)
         )

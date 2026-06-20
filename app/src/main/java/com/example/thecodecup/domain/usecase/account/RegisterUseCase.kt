@@ -63,13 +63,12 @@ class RegisterUseCase(
                 email = email,
                 fullName = fullName,
                 phoneNumber = phone,
-                avatarUrl = "" // Default empty avatar URL
+                avatarUrl = ""
             )
 
             // Command the dumb repository to insert the row
             userRepository.registerUser(newUserModel, password)
 
-            // Return success
             Result.success(Unit)
 
         } catch (e: Exception) {

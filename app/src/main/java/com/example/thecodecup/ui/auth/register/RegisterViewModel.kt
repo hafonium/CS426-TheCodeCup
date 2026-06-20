@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-// 1. The State Definition (Usually at the top of the file)
 sealed class RegisterUiState {
     object Idle : RegisterUiState()
     object Loading : RegisterUiState()
@@ -17,16 +16,16 @@ sealed class RegisterUiState {
 }
 
 class RegisterViewModel(
-    private val registerUseCase: RegisterUseCase // Injected from the Domain layer
+    private val registerUseCase: RegisterUseCase
 ) : ViewModel() {
 
-    // 2. The State Holder (Private vs Public)
+    // The State Holder (Private vs Public)
     // _uiState is private and mutable. Only the ViewModel can change it.
     private val _uiState = MutableStateFlow<RegisterUiState>(RegisterUiState.Idle)
     // uiState is public and read-only. The UI observes this but cannot change it.
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
-    // 3. The User Intent (Action triggered by the UI)
+    // The User Intent (Action triggered by the UI)
     fun onRegisterClicked(
         name: String,
         email: String,
@@ -40,7 +39,6 @@ class RegisterViewModel(
         // Launch a background thread so the UI doesn't freeze
         viewModelScope.launch {
 
-            // Call the core logic (The Use Case we built earlier)
             val result = registerUseCase(name, email, phone, pass, confirmPass)
 
             // Update the state based on the result
@@ -52,7 +50,7 @@ class RegisterViewModel(
         }
     }
 
-    // 4. State Reset (Crucial for when the user dismisses an error dialog)
+    // State Reset (Crucial for when the user dismisses an error dialog)
     fun resetState() {
         _uiState.value = RegisterUiState.Idle
     }
