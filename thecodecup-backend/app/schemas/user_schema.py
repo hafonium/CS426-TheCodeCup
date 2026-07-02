@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 class UserBase(BaseModel):
     email: EmailStr
-    fullname: str
+    full_name: str
     phone_number: str
     avatar_res_id: str | None = None
     model_config = ConfigDict(from_attributes=True)
@@ -13,7 +13,7 @@ class UserCreate(UserBase):
         json_schema_extra={
             "example": {
                 "email": "",
-                "fullname": "",
+                "full_name": "",
                 "phone_number": "",
                 "avatar_res_id": None, 
                 "password": ""

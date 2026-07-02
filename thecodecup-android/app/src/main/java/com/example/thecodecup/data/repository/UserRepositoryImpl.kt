@@ -1,52 +1,52 @@
 package com.example.thecodecup.data.repository
 
-import com.example.thecodecup.data.local.dao.UserDao
-import com.example.thecodecup.data.local.entities.UserEntity
-import com.example.thecodecup.domain.models.UserModel
+import com.example.thecodecup.data.local.prefs.AuthPreferences
+import com.example.thecodecup.data.remote.dto.UserCreateDto
+import com.example.thecodecup.data.remote.network.ApiClient
+import com.example.thecodecup.domain.models.UserCreateModel
+import com.example.thecodecup.domain.models.UserResponseModel
 import com.example.thecodecup.domain.repository.UserRepository
+import com.example.thecodecup.ui.auth.register.RegisterScreen
+import com.example.thecodecup.utils.getHttpMessage
+import org.json.JSONObject
+import retrofit2.HttpException
 
 class UserRepositoryImpl(
-    private val userDao: UserDao
-) : UserRepository {
-    override suspend fun getUserById(userId: Int): UserModel? {
-        return userDao.getById(userId)?.toDomainModel()
-    }
+    private val authPreferences: AuthPreferences
+): UserRepository {
+    private val api = ApiClient.userApiService
 
-    override suspend fun registerUser(user: UserModel, password: String) {
-        val userEntity = user.toEntity(password)
-        userDao.register(userEntity)
-    }
-
-    override suspend fun loginUser(email: String, password: String): UserModel? {
-        return userDao.login(email, password)?.toDomainModel()
-    }
-
-    override suspend fun updateUserExceptPassword(user: UserModel) {
-        userDao.updateExceptPassword(
-            userId = user.id,
+    override suspend fun registerUser(user: UserCreateModel): Result<Unit> {
+        val userCreate = UserCreateDto(
             email = user.email,
+            password = user.password,
             fullName = user.fullName,
             phoneNumber = user.phoneNumber,
-            avatarUrl = user.avatarUrl
         )
-    }
-
-    override suspend fun deleteUser(userId: Int) {
-        val userEntity = userDao.getById(userId)
-        if (userEntity != null) {
-            userDao.delete(userEntity)
+        return try {
+            api.createUser(userCreate)
+            Result.success(Unit)
+        } catch (e: HttpException) {
+            val errorMessage = getHttpMessage(e)
+            Result.failure(Exception(errorMessage))
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to register user: ${e.message}"))
         }
     }
 
-    override suspend fun updatePassword(userId: Int, currentPassword: String, newPassword: String) {
-        userDao.updatePassword(userId, currentPassword, newPassword)
-    }
+    override suspend fun getCurrentUser(): Result<UserResponseModel> {
+        return try {
+            val token = authPreferences.getAuthToken()
+                ?: return Result.failure(Exception("No auth token found"))
 
-    override suspend fun checkIfEmailExists(email: String): Boolean {
-        return userDao.checkIfEmailExists(email)
-    }
-
-    override suspend fun checkIfPhoneExists(phone: String): Boolean {
-        return userDao.checkIfPhoneExists(phone)
+            val authToken = "Bearer $token"
+            val userResponse = api.getCurrentUser(authToken)
+            Result.success(userResponse.toDomainModel())
+        } catch (e: HttpException) {
+            val errorMessage = getHttpMessage(e)
+            Result.failure(Exception(errorMessage))
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to fetch current user: ${e.message}"))
+        }
     }
 }

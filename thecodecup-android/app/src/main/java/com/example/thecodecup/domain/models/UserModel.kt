@@ -1,22 +1,29 @@
 package com.example.thecodecup.domain.models
 
-import com.example.thecodecup.data.local.entities.UserEntity
 
-data class UserModel(
+data class UserBaseModel (
+    val email: String,
+    val fullName: String,
+    val phoneNumber: String,
+    val avatarUrl: String? = null
+)
+
+data class UserResponseModel (
     val id: Int,
     val email: String,
     val fullName: String,
     val phoneNumber: String,
-    val avatarUrl: String
-) {
-    fun toEntity(userPassword: String): UserEntity {
-        return UserEntity(
-            id = id,
-            email = email,
-            password = userPassword,
-            fullName = fullName,
-            phoneNumber = phoneNumber,
-            avatarUrl = avatarUrl
-        )
-    }
-}
+    val avatarResId: String? = null
+)
+
+data class UserCreateModel(
+    val email: String,
+    val password: String,
+    val fullName: String,
+    val phoneNumber: String
+)
+
+data class UserLoginModel(
+    val email: String,
+    val password: String
+)
