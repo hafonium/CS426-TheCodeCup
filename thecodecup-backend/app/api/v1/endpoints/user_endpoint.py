@@ -5,6 +5,7 @@ from starlette import status
 from app.repository import user_repository
 from app.api.deps import get_db, get_current_user
 from app.models.user_model import UserModel
+from app.core.exceptions import EmailAlreadyExistsException
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -23,6 +24,9 @@ def get_user(user_id: int, db: Session = Depends(get_db)) -> UserResponse:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return db_user
 
-@router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def create_user(user: UserCreate, db: Session = Depends(get_db)) -> UserResponse:
-    return user_repository.create_user(db, user)
+@router.post("", status_code=status.HTTP_201_CREATED)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    try:
+        user_repository.create_user(db, user)
+    except EmailAlreadyExistsException as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

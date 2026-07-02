@@ -1,8 +1,11 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
 }
+
 
 android {
     namespace = "com.example.thecodecup"
@@ -20,6 +23,20 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Load the local.properties file
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+
+        // Safely grab the value (or provide a fallback)
+        val apiUrl = localProperties.getProperty("API_URL")?.let { "\"$it\"" } ?: "\"http://localhost/\""
+
+        // Inject it into the BuildConfig file
+        // Parameters: Type, Name, Value
+        buildConfigField("String", "API_URL", apiUrl)
     }
 
     buildTypes {
@@ -37,6 +54,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -52,6 +70,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.test)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
@@ -74,4 +93,9 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion") // For Coroutines support
     ksp("androidx.room:room-compiler:$roomVersion")
 
+    // Retrofit & Gson Converter (this usually includes Gson automatically)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }

@@ -10,9 +10,10 @@ class UserModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String)
-    fullname: Mapped[str] = mapped_column(String)
+    full_name: Mapped[str] = mapped_column(String)
     phone_number: Mapped[str] = mapped_column(String)
     avatar_res_id: Mapped[str] = mapped_column(String, nullable=True)
+    token_version: Mapped[int] = mapped_column(default=0)
 
 
     @field_validator("phone_number")
