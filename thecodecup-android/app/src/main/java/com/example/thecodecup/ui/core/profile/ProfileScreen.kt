@@ -25,9 +25,17 @@ fun ProfileScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchCurrentUser()
+    }
+
     ProfileScreenContent(
-        uiState = ProfileUiState.Idle,
+        uiState = uiState,
         onLogoutClicked = {viewModel.onLogoutClicked()},
+        fetchCurrentUser = {viewModel.fetchCurrentUser()},
+        onUpdateClicked = { email, fullName, phone, avatarUrl, address, oldPassword, newPassword, confirmNewPassword ->
+            viewModel.updateUser(email, fullName, phone, avatarUrl, address, oldPassword, newPassword, confirmNewPassword)
+        },
         onNavigateToHome = onNavigateToHome,
         modifier = modifier
     )

@@ -30,6 +30,7 @@ class RegisterViewModel(
         name: String,
         email: String,
         phone: String,
+        address: String,
         pass: String,
         confirmPass: String
     ) {
@@ -39,7 +40,12 @@ class RegisterViewModel(
         // Launch a background thread so the UI doesn't freeze
         viewModelScope.launch {
 
-            val result = registerUseCase(name, email, phone, pass, confirmPass)
+            val result = registerUseCase(
+                fullName = name,
+                email = email,
+                phone = phone,
+                password = pass, confirmPass,
+                address = address)
 
             // Update the state based on the result
             result.onSuccess {

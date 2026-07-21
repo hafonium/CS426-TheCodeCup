@@ -27,8 +27,8 @@ fun RegisterScreen(
 
     RegisterScreenContent(
         uiState = uiState,
-        onRegisterClicked = { name, email, phone, pass, confirm ->
-            viewModel.onRegisterClicked(name, email, phone, pass, confirm)
+        onRegisterClicked = { name, email, phone, address, pass, confirm ->
+            viewModel.onRegisterClicked(name, email, phone, address, pass, confirm)
         },
         onNavigateToWelcome = onNavigateToWelcome,
         onNavigateToLogin = onNavigateToLogin,
@@ -42,7 +42,7 @@ fun RegisterScreenPreview_Idle() {
     ScreenWrapper {
         RegisterScreenContent(
             uiState = RegisterUiState.Idle,
-            onRegisterClicked = { _, _, _, _, _ -> },
+            onRegisterClicked = { _, _, _, _, _, _ -> },
             onNavigateToWelcome = {},
             onNavigateToLogin = {}
         )
@@ -55,7 +55,7 @@ fun RegisterScreenPreview_Loading() {
     ScreenWrapper {
         RegisterScreenContent(
             uiState = RegisterUiState.Loading,
-            onRegisterClicked = { _, _, _, _, _ -> },
+            onRegisterClicked = { _, _, _, _, _, _ -> },
             onNavigateToWelcome = {},
             onNavigateToLogin = {}
         )
@@ -68,7 +68,7 @@ fun RegisterScreenPreview_Error() {
     ScreenWrapper {
         RegisterScreenContent(
             uiState = RegisterUiState.Error("Passwords do not match"),
-            onRegisterClicked = { _, _, _, _, _ -> },
+            onRegisterClicked = { _, _, _, _, _, _ -> },
             onNavigateToWelcome = {},
             onNavigateToLogin = {}
         )

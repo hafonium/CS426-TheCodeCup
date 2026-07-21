@@ -23,4 +23,5 @@ class App(): Application() {
     val logoutUseCase by lazy { LogoutUseCase(authRepository, authPrefs) }
     val registerUseCase by lazy { RegisterUseCase(userRepository) }
     val getCurrentUserUseCase by lazy { GetCurrentUserUseCase(userRepository) }
+    val updateUserUseCase by lazy { com.example.thecodecup.domain.usecase.profile.UpdateUserUseCase(userRepository) }
 }

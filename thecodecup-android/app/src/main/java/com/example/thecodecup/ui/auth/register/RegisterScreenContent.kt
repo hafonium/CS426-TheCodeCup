@@ -37,7 +37,7 @@ import com.example.thecodecup.ui.theme.White
 @Composable
 fun RegisterScreenContent(
     uiState: RegisterUiState,
-    onRegisterClicked: (String, String, String, String, String) -> Unit,
+    onRegisterClicked: (String, String, String, String, String, String) -> Unit,
     onNavigateToWelcome: () -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
@@ -47,11 +47,13 @@ fun RegisterScreenContent(
     var nameText by remember { mutableStateOf("") }
     var phoneText by remember { mutableStateOf("") }
     var emailText by remember { mutableStateOf("") }
+    var addressText by remember { mutableStateOf("") }
     var passwordText by remember { mutableStateOf("") }
     var confirmPasswordText by remember { mutableStateOf("") }
     val isFormComplete = nameText.isNotBlank() &&
             phoneText.isNotBlank() &&
             emailText.isNotBlank() &&
+            addressText.isNotBlank() &&
             passwordText.isNotBlank() &&
             confirmPasswordText.isNotBlank()
 
@@ -62,7 +64,7 @@ fun RegisterScreenContent(
                 focusManager.clearFocus() // Closes the keyboard
                 // Trigger the registration!
                 if (uiState !is RegisterUiState.Loading) {
-                    onRegisterClicked(nameText, emailText, phoneText, passwordText, confirmPasswordText)
+                    onRegisterClicked(nameText, emailText, phoneText, addressText, passwordText, confirmPasswordText)
                 }
             }
         )
@@ -112,6 +114,18 @@ fun RegisterScreenContent(
         )
 
         CustomTextField(
+            value = emailText,
+            onValueChange = { emailText = it },
+            placeholderText = "Enter your email",
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = imeAction
+            ),
+            keyboardActions = keyboardActions,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+        )
+
+        CustomTextField(
             value = phoneText,
             onValueChange = { phoneText = it },
             placeholderText = "Enter your phone number",
@@ -124,9 +138,9 @@ fun RegisterScreenContent(
         )
 
         CustomTextField(
-            value = emailText,
-            onValueChange = { emailText = it },
-            placeholderText = "Enter your email",
+            value = addressText,
+            onValueChange = { addressText = it },
+            placeholderText = "Enter your address",
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = imeAction
@@ -175,7 +189,7 @@ fun RegisterScreenContent(
         Button(
             onClick = {
                 if (uiState !is RegisterUiState.Loading) {
-                    onRegisterClicked(nameText, emailText, phoneText, passwordText, confirmPasswordText)
+                    onRegisterClicked(nameText, emailText, phoneText, addressText, passwordText, confirmPasswordText)
                 }
             },
             modifier = Modifier

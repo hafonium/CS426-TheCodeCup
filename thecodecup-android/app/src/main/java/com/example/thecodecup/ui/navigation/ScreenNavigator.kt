@@ -135,7 +135,11 @@ fun ScreenNavigator(
                 factory = viewModelFactory {
                     initializer {
                         val appInstance = context.applicationContext as App
-                        ProfileViewModel(appInstance.logoutUseCase)
+                        ProfileViewModel(
+                            appInstance.logoutUseCase,
+                            appInstance.getCurrentUserUseCase,
+                            appInstance.updateUserUseCase
+                        )
                     }
                 }
 

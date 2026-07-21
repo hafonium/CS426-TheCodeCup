@@ -5,14 +5,15 @@ from pydantic import field_validator
 import phonenumbers
 
 class UserModel(Base):
-    __tablename__ = "users"
+    __tablename__ = "USERS"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String)
     full_name: Mapped[str] = mapped_column(String)
     phone_number: Mapped[str] = mapped_column(String)
-    avatar_res_id: Mapped[str] = mapped_column(String, nullable=True)
+    avatar_image_path: Mapped[str] = mapped_column(String, nullable=True)
+    address: Mapped[str] = mapped_column(String)
     token_version: Mapped[int] = mapped_column(default=0)
 
 
