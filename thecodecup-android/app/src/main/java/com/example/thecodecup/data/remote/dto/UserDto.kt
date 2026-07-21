@@ -7,7 +7,8 @@ data class UserCreateDto(
     @SerializedName("email") val email: String,
     @SerializedName("full_name") val fullName: String,
     @SerializedName("phone_number") val phoneNumber: String,
-    @SerializedName("password") val password: String
+    @SerializedName("password") val password: String,
+    @SerializedName("address") val address: String
 )
 
 data class UserLoginDto(
@@ -20,7 +21,8 @@ data class UserResponseDto(
     @SerializedName("email") val email: String,
     @SerializedName("full_name") val fullName: String,
     @SerializedName("phone_number") val phoneNumber: String,
-    @SerializedName("avatar_res_id") val avatarResId: String? = null
+    @SerializedName("avatar_res_id") val avatarResId: String? = null,
+    @SerializedName("address") val address: String
 ) {
     fun toDomainModel(): UserResponseModel {
         return UserResponseModel(
@@ -28,7 +30,18 @@ data class UserResponseDto(
             email = email,
             fullName = fullName,
             phoneNumber = phoneNumber,
-            avatarResId = avatarResId
+            avatarUrl = avatarResId,
+            address = address
         )
     }
 }
+
+data class UserUpdateDto(
+    @SerializedName("email") val email: String,
+    @SerializedName("full_name") val fullName: String,
+    @SerializedName("phone_number") val phoneNumber: String,
+    @SerializedName("avatar_res_id") val avatarResId: String? = null,
+    @SerializedName("address") val address: String,
+    @SerializedName("old_password") val oldPassword: String? = null,
+    @SerializedName("new_password") val newPassword: String? = null
+)

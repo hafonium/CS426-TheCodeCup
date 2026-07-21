@@ -19,7 +19,8 @@ class RegisterUseCase(
         email: String,
         phone: String,
         password: String,
-        confirmPassword: String
+        confirmPassword: String,
+        address: String
     ): Result<Unit> {
         if(fullName.isBlank() || email.isBlank() || phone.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
             return Result.failure(Exception("All fields are required"))
@@ -37,7 +38,8 @@ class RegisterUseCase(
             email = email,
             password = password,
             fullName = fullName,
-            phoneNumber = phone
+            phoneNumber = phone,
+            address = address 
         )
 
         val result = userRepository.registerUser(user)
