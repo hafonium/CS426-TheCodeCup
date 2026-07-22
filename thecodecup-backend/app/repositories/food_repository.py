@@ -4,9 +4,10 @@ from app.models.food_model import FoodModel
 from app.models.food_option_model import FoodOptionModel
 from app.schemas.food_schema import FoodCreate, FoodUpdate
 
-def get_all_food(db: Session) -> list[FoodModel]:
+def get_all_food(db: Session, category: str = None) -> list[FoodModel]:
     stmt = (
         select(FoodModel)
+        .where(FoodModel.category == category) if category else select(FoodModel)
         .options(
             selectinload(FoodModel.options).selectinload(FoodOptionModel.option_types)
         )
