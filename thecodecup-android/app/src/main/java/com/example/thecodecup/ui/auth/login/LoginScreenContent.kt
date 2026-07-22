@@ -1,6 +1,6 @@
 package com.example.thecodecup.ui.auth.login
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,12 +27,15 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.thecodecup.ui.auth.register.RegisterUiState
 import com.example.thecodecup.ui.components.CustomTextField
 import com.example.thecodecup.ui.components.buttons.BackButton
 import com.example.thecodecup.ui.components.buttons.Button
-import com.example.thecodecup.ui.theme.White
+import com.example.thecodecup.ui.theme.CoffeeBlue
+import com.example.thecodecup.ui.theme.CoffeeNavy
 
 @Composable
 fun LoginScreenContent(
@@ -42,7 +45,7 @@ fun LoginScreenContent(
     onNavigateToRegister: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val buttonShape = RoundedCornerShape(percent = 15)
+    val buttonShape = RoundedCornerShape(14.dp)
     val focusManager = LocalFocusManager.current
     var emailText by remember { mutableStateOf("") }
     var passwordText by remember { mutableStateOf("") }
@@ -69,23 +72,20 @@ fun LoginScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(Color.White)
             .systemBarsPadding()
-            .padding(16.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp),
     ) {
         BackButton(
             onClick = onNavigateToWelcome,
-            modifier = Modifier
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = buttonShape
-                )
-                .size(48.dp)
+            modifier = Modifier.size(44.dp)
         )
 
         Text(
             text = "Welcome back! Glad to see you, Again!",
             style = MaterialTheme.typography.headlineMedium,
+            color = CoffeeNavy,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(top = 32.dp)
                 .padding(bottom = 24.dp)
@@ -125,7 +125,7 @@ fun LoginScreenContent(
         Text(
             text = "Forgot your password?",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
+            color = CoffeeBlue,
             modifier = Modifier
                 .clickable {
                     // Handle forgot password logic here
@@ -154,12 +154,8 @@ fun LoginScreenContent(
                 .fillMaxWidth()
                 .padding(top = 16.dp)
                 .padding(bottom = 16.dp)
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = buttonShape
-                ),
-            backgroundGradient = listOf(White, White),
+                .padding(bottom = 16.dp),
+            backgroundGradient = listOf(CoffeeBlue, CoffeeBlue),
             shape = buttonShape,
         ) {
             if (uiState is LoginUiState.Loading) {
@@ -170,7 +166,7 @@ fun LoginScreenContent(
 
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.primary
+                        color = Color.White
                     )
                 }
             } else {
@@ -185,7 +181,7 @@ fun LoginScreenContent(
         Text(
             text = "Don't have an account? Sign up",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
+            color = CoffeeBlue,
             modifier = Modifier
                 .clickable {
                     onNavigateToRegister()

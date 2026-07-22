@@ -1,8 +1,8 @@
-package com.example.thecodecup.domain.usecase.auth
+package com.example.thecodecup.domain.usecases.auth
 
 import com.example.thecodecup.data.local.prefs.AuthPreferences
 import com.example.thecodecup.domain.models.UserLoginModel
-import com.example.thecodecup.domain.repository.AuthRepository
+import com.example.thecodecup.domain.repositories.AuthRepository
 
 class LoginUseCase (
     private val authRepository: AuthRepository,

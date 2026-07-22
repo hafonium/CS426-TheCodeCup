@@ -15,6 +15,8 @@ import com.example.thecodecup.ui.App
 import com.example.thecodecup.ui.auth.auth.AuthState
 import com.example.thecodecup.ui.auth.auth.AuthViewModel
 import com.example.thecodecup.ui.core.home.HomeScreen
+import com.example.thecodecup.ui.core.home.HomeViewModel
+import com.example.thecodecup.ui.core.home.HomeDestinationPlaceholder
 import com.example.thecodecup.ui.auth.login.LoginScreen
 import com.example.thecodecup.ui.auth.login.LoginViewModel
 import com.example.thecodecup.ui.auth.register.RegisterScreen
@@ -70,10 +72,44 @@ fun ScreenNavigator(
         }
 
         composable(route = Screen.Home.route) {
+            val homeViewModel: HomeViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        val appInstance = context.applicationContext as App
+                        HomeViewModel(appInstance.getCurrentUserUseCase, appInstance.getFoodsUseCase)
+                    }
+                }
+            )
             HomeScreen(
+                viewModel = homeViewModel,
                 onNavigateToProfile = {
                     navController.navigate(Screen.Profile.route)
-                }
+                },
+                onNavigateToCart = { navController.navigate(Screen.Cart.route) },
+                onNavigateToRewards = { navController.navigate(Screen.Rewards.route) },
+                onNavigateToOrder = { navController.navigate(Screen.Order.route) },
+                onNavigateToDetails = { navController.navigate(Screen.Details.createRoute(it)) }
+            )
+        }
+
+        composable(route = Screen.Cart.route) {
+            HomeDestinationPlaceholder("Cart", onNavigateBack = navController::popBackStack)
+        }
+
+        composable(route = Screen.Rewards.route) {
+            HomeDestinationPlaceholder("Rewards", onNavigateBack = navController::popBackStack)
+        }
+
+        composable(route = Screen.Order.route) {
+            HomeDestinationPlaceholder("Order", onNavigateBack = navController::popBackStack)
+        }
+
+        composable(route = Screen.Details.route) { backStackEntry ->
+            val foodId = backStackEntry.arguments?.getString("foodId")
+            HomeDestinationPlaceholder(
+                title = "Details",
+                subtitle = foodId?.let { "Coffee #$it" } ?: "Coming soon",
+                onNavigateBack = navController::popBackStack
             )
         }
 

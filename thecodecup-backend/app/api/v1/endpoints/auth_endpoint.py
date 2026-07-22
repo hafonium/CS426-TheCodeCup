@@ -6,12 +6,12 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
 from app.core.security import verify_password, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
-from app.repository import user_repository
+from app.repositories import user_repository
 from app.schemas.token_schema import Token
 from app.models.user_model import UserModel
 import jwt
 from app.core.security import SECRET_KEY, ALGORITHM
-from app.repository import revoked_token_repository
+from app.repositories import revoked_token_repository
 from datetime import datetime, timezone
 
 router = APIRouter(prefix="/auth", tags=["auth"])

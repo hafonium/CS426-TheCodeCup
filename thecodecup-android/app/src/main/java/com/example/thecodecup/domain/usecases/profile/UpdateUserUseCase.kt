@@ -1,7 +1,7 @@
-package com.example.thecodecup.domain.usecase.profile
+package com.example.thecodecup.domain.usecases.profile
 
 import com.example.thecodecup.domain.models.UserUpdateModel
-import com.example.thecodecup.domain.repository.UserRepository
+import com.example.thecodecup.domain.repositories.UserRepository
 
 class UpdateUserUseCase(
     private val userRepository: UserRepository

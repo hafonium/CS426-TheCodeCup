@@ -1,7 +1,6 @@
 package com.example.thecodecup.ui.auth.register
 
-import android.util.Log
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,11 +29,14 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.thecodecup.ui.components.CustomTextField
 import com.example.thecodecup.ui.components.buttons.BackButton
 import com.example.thecodecup.ui.components.buttons.Button
-import com.example.thecodecup.ui.theme.White
+import com.example.thecodecup.ui.theme.CoffeeBlue
+import com.example.thecodecup.ui.theme.CoffeeNavy
 
 @Composable
 fun RegisterScreenContent(
@@ -42,7 +46,7 @@ fun RegisterScreenContent(
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val buttonShape = RoundedCornerShape(percent = 15)
+    val buttonShape = RoundedCornerShape(14.dp)
     val focusManager = LocalFocusManager.current
     var nameText by remember { mutableStateOf("") }
     var phoneText by remember { mutableStateOf("") }
@@ -79,23 +83,21 @@ fun RegisterScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(Color.White)
             .systemBarsPadding()
-            .padding(16.dp),
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 16.dp),
     ) {
         BackButton(
             onClick = onNavigateToWelcome,
-            modifier = Modifier
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = buttonShape
-                )
-                .size(48.dp)
+            modifier = Modifier.size(44.dp)
         )
 
         Text(
             text = "Hello! Register to get started",
             style = MaterialTheme.typography.headlineMedium,
+            color = CoffeeNavy,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(top = 32.dp)
                 .padding(bottom = 24.dp)
@@ -195,12 +197,8 @@ fun RegisterScreenContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = buttonShape
-                ),
-            backgroundGradient = listOf(White, White),
+                .padding(bottom = 16.dp),
+            backgroundGradient = listOf(CoffeeBlue, CoffeeBlue),
             shape = buttonShape,
         ) {
             if (uiState is RegisterUiState.Loading) {
@@ -211,7 +209,7 @@ fun RegisterScreenContent(
 
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.primary
+                        color = Color.White
                     )
                 }
             } else {
@@ -226,7 +224,7 @@ fun RegisterScreenContent(
         Text(
             text = "Already have an account? Login now",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
+            color = CoffeeBlue,
             modifier = Modifier
                 .clickable {
                     onNavigateToLogin()

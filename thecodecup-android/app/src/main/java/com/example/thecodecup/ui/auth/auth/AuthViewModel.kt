@@ -3,7 +3,7 @@ package com.example.thecodecup.ui.auth.auth
 import com.example.thecodecup.domain.models.UserResponseModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.thecodecup.domain.usecase.auth.GetCurrentUserUseCase
+import com.example.thecodecup.domain.usecases.auth.GetCurrentUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

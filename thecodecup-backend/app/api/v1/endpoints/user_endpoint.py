@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.schemas.user_schema import UserCreate, UserResponse, UserUpdate
 from starlette import status
-from app.repository import user_repository
+from app.repositories import user_repository
 from app.api.deps import get_db, get_current_user
 from app.models.user_model import UserModel
 from app.core.exceptions import EmailAlreadyExistsException, PasswordMismatchException

@@ -2,7 +2,7 @@ package com.example.thecodecup.ui.auth.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.thecodecup.domain.usecase.auth.RegisterUseCase
+import com.example.thecodecup.domain.usecases.auth.RegisterUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

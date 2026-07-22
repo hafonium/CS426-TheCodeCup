@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
@@ -29,6 +29,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.thecodecup.ui.theme.CoffeeBlue
+import com.example.thecodecup.ui.theme.CoffeeCard
+import com.example.thecodecup.ui.theme.CoffeeNavy
 
 @Composable
 fun ProfileItemRow(
@@ -52,14 +55,14 @@ fun ProfileItemRow(
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .clip(RoundedCornerShape(14.dp))
+                .background(CoffeeCard),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = CoffeeBlue
             )
         }
 
@@ -71,7 +74,7 @@ fun ProfileItemRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = CoffeeBlue
             )
 
             if (isEditing) {
@@ -89,7 +92,7 @@ fun ProfileItemRow(
                     text = displayValue,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = CoffeeNavy
                 )
             }
         }
@@ -119,7 +122,7 @@ fun ProfileItemRow(
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Save $label",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = CoffeeBlue
                     )
                 }
             }
@@ -133,7 +136,7 @@ fun ProfileItemRow(
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit $label",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = CoffeeBlue
                 )
             }
         }

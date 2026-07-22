@@ -1,13 +1,10 @@
-package com.example.thecodecup.domain.usecase.auth
+package com.example.thecodecup.domain.usecases.auth
 
 import android.os.Build
-import android.util.Log
 import android.util.Patterns
 import androidx.annotation.RequiresExtension
 import com.example.thecodecup.domain.models.UserCreateModel
-import com.example.thecodecup.domain.repository.UserRepository
-import org.json.JSONObject
-import retrofit2.HttpException
+import com.example.thecodecup.domain.repositories.UserRepository
 
 // Use case for registering a new user
 class RegisterUseCase(

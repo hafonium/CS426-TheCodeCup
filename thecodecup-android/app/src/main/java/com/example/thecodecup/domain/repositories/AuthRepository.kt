@@ -1,4 +1,4 @@
-package com.example.thecodecup.domain.repository
+package com.example.thecodecup.domain.repositories
 
 import com.example.thecodecup.domain.models.TokenModel
 import com.example.thecodecup.domain.models.UserLoginModel
