@@ -10,8 +10,8 @@ from app.api.deps import get_db, get_current_user
 router = APIRouter(prefix="/foods", tags=["foods"])
 
 @router.get("", response_model=list[FoodResponse], status_code=status.HTTP_200_OK)
-def list_foods(db: Session = Depends(get_db)) -> list[FoodResponse]:
-    return food_repository.get_all_food(db)
+def list_foods(db: Session = Depends(get_db), category: str = None) -> list[FoodResponse]:
+    return food_repository.get_all_food(db, category=category)
 
 @router.get("/{food_id}", response_model=FoodResponse, status_code=status.HTTP_200_OK)
 def get_food(food_id: int, db: Session = Depends(get_db)) -> FoodResponse:
