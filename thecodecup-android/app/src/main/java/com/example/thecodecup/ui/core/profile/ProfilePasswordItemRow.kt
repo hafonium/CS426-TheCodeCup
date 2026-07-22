@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -39,6 +39,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.thecodecup.ui.theme.CoffeeBlue
+import com.example.thecodecup.ui.theme.CoffeeCard
+import com.example.thecodecup.ui.theme.CoffeeNavy
 
 @Composable
 fun ProfilePasswordItemRow(
@@ -80,14 +83,14 @@ fun ProfilePasswordItemRow(
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .clip(RoundedCornerShape(14.dp))
+                .background(CoffeeCard),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Outlined.Lock,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = CoffeeBlue
             )
         }
 
@@ -99,7 +102,7 @@ fun ProfilePasswordItemRow(
             Text(
                 text = "Password",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = CoffeeBlue
             )
 
             if (isEditing) {
@@ -140,7 +143,7 @@ fun ProfilePasswordItemRow(
                     text = "********",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = CoffeeNavy
                 )
             }
         }
@@ -167,7 +170,7 @@ fun ProfilePasswordItemRow(
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Save password",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = CoffeeBlue
                     )
                 }
             }
@@ -176,7 +179,7 @@ fun ProfilePasswordItemRow(
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit password",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = CoffeeBlue
                 )
             }
         }

@@ -1,7 +1,7 @@
-package com.example.thecodecup.domain.usecase.auth
+package com.example.thecodecup.domain.usecases.auth
 
 import com.example.thecodecup.domain.models.UserResponseModel
-import com.example.thecodecup.domain.repository.UserRepository
+import com.example.thecodecup.domain.repositories.UserRepository
 
 class GetCurrentUserUseCase(private val userRepository: UserRepository) {
     suspend operator fun invoke(): Result<UserResponseModel> {

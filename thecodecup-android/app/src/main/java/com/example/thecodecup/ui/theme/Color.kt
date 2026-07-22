@@ -17,3 +17,8 @@ val Black = Color(0xFF000000)
 val LightGray = Color(0xFFBDBDBD)
 val DarkBlue = Color(0xFF001F3F)
 val SuperDarkBlue = Color(0xFF0F2333)
+
+// Shared coffee-shop palette used by Home and its supporting screens.
+val CoffeeBlue = Color(0xFF324E5D)
+val CoffeeNavy = Color(0xFF17324A)
+val CoffeeCard = Color(0xFFF5F6FA)

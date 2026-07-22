@@ -1,10 +1,11 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from typing import Optional
 
 class UserBase(BaseModel):
     email: EmailStr
     full_name: str
     phone_number: str
-    avatar_image_path: str | None = None
+    avatar_image_path: Optional[str] = None
     address: str
     model_config = ConfigDict(from_attributes=True)
 
@@ -23,14 +24,14 @@ class UserCreate(UserBase):
         }
     )
 
-class UserUpdate(UserBase):
-    email: EmailStr | None = None
-    full_name: str | None = None
-    phone_number: str | None = None
-    avatar_image_path: str | None = None
-    address: str | None = None
-    old_password: str | None = None
-    new_password: str | None = None
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    avatar_image_path: Optional[str] = None
+    address: Optional[str] = None
+    old_password: Optional[str] = None
+    new_password: Optional[str] = None
     model_config = ConfigDict(
         json_schema_extra={
             "example": {

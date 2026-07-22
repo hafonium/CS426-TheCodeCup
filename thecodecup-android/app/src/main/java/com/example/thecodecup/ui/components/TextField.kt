@@ -15,6 +15,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.thecodecup.R 
+import com.example.thecodecup.ui.theme.CoffeeBlue
+import com.example.thecodecup.ui.theme.CoffeeCard
+import com.example.thecodecup.ui.theme.CoffeeNavy
 
 @Composable
 fun CustomTextField(
@@ -31,7 +34,7 @@ fun CustomTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = { Text(placeholderText, color = Color.Gray) },
+        placeholder = { Text(placeholderText, color = CoffeeNavy.copy(alpha = 0.5f)) },
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
 
@@ -52,17 +55,20 @@ fun CustomTextField(
                 val description = if (passwordVisible) "Hide password" else "Show password"
 
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(painter = image, contentDescription = description, tint = Color.Gray)
+                    Icon(painter = image, contentDescription = description, tint = CoffeeBlue)
                 }
             }
         } else null,
 
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color(0xFFF5F7F9),
-            unfocusedContainerColor = Color(0xFFF5F7F9),
+            focusedContainerColor = CoffeeCard,
+            unfocusedContainerColor = CoffeeCard,
             focusedBorderColor = Color.Transparent,
             unfocusedBorderColor = Color.Transparent,
+            focusedTextColor = CoffeeNavy,
+            unfocusedTextColor = CoffeeNavy,
+            cursorColor = CoffeeBlue,
         ),
         modifier = modifier.fillMaxWidth()
     )

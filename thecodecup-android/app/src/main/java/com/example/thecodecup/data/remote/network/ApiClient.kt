@@ -2,6 +2,7 @@ package com.example.thecodecup.data.remote.network
 
 import com.example.thecodecup.BuildConfig
 import com.example.thecodecup.data.remote.api.AuthApiService
+import com.example.thecodecup.data.remote.api.FoodApiService
 import com.example.thecodecup.data.remote.api.UserApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -37,5 +38,9 @@ object ApiClient {
 
     val authApiService: AuthApiService by lazy {
         retrofit.create(AuthApiService::class.java)
+    }
+
+    val foodApiService: FoodApiService by lazy {
+        retrofit.create(FoodApiService::class.java)
     }
 }

@@ -1,6 +1,6 @@
 package com.example.thecodecup.ui.core.profile
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +26,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.thecodecup.ui.components.buttons.BackButton
 import com.example.thecodecup.ui.components.buttons.Button
-import com.example.thecodecup.ui.theme.White
+import androidx.compose.ui.graphics.Color
+import com.example.thecodecup.ui.theme.CoffeeBlue
+import com.example.thecodecup.ui.theme.CoffeeNavy
 
 @Composable
 fun ProfileScreenContent(
@@ -37,7 +39,7 @@ fun ProfileScreenContent(
     modifier: Modifier = Modifier,
     onNavigateToHome: () -> Unit = { }
 ) {
-    val buttonShape = RoundedCornerShape(percent = 15)
+    val buttonShape = RoundedCornerShape(14.dp)
 
     // Initial Loading State
     if (uiState is ProfileUiState.Loading) {
@@ -45,7 +47,7 @@ fun ProfileScreenContent(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            CircularProgressIndicator(color = CoffeeBlue)
         }
         return
     }
@@ -61,8 +63,9 @@ fun ProfileScreenContent(
         Column(
             modifier = modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .systemBarsPadding()
-                .padding(24.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             // Top Bar
             Box(
@@ -73,21 +76,14 @@ fun ProfileScreenContent(
             ) {
                 BackButton(
                     onClick = onNavigateToHome,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = buttonShape
-                        )
-                        .size(48.dp)
+                    modifier = Modifier.align(Alignment.CenterStart).size(44.dp)
                 )
 
                 Text(
                     text = "Profile",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = CoffeeNavy,
                     textAlign = TextAlign.Center
                 )
             }
@@ -170,13 +166,8 @@ fun ProfileScreenContent(
                 onClick = onLogoutClicked,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = buttonShape
-                    ),
-                backgroundGradient = listOf(White, White),
+                    .padding(bottom = 16.dp),
+                backgroundGradient = listOf(CoffeeBlue, CoffeeBlue),
                 shape = buttonShape,
             ) {
                 Text(

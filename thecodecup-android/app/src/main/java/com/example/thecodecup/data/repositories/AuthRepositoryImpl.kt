@@ -1,10 +1,10 @@
-package com.example.thecodecup.data.repository
+package com.example.thecodecup.data.repositories
 
 import com.example.thecodecup.data.local.prefs.AuthPreferences
 import com.example.thecodecup.data.remote.network.ApiClient
 import com.example.thecodecup.domain.models.TokenModel
 import com.example.thecodecup.domain.models.UserLoginModel
-import com.example.thecodecup.domain.repository.AuthRepository
+import com.example.thecodecup.domain.repositories.AuthRepository
 import com.example.thecodecup.utils.getHttpMessage
 import retrofit2.HttpException
 

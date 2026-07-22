@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import SECRET_KEY, ALGORITHM
 from app.schemas.token_schema import TokenData
-from app.repository import user_repository, revoked_token_repository
+from app.repositories import user_repository, revoked_token_repository
 from app.models.user_model import UserModel
 from app.core.database import SessionLocal
 

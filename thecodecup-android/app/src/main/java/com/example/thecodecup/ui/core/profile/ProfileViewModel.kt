@@ -3,9 +3,9 @@ package com.example.thecodecup.ui.core.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.thecodecup.domain.models.UserResponseModel
-import com.example.thecodecup.domain.usecase.auth.GetCurrentUserUseCase
-import com.example.thecodecup.domain.usecase.auth.LogoutUseCase
-import com.example.thecodecup.domain.usecase.profile.UpdateUserUseCase
+import com.example.thecodecup.domain.usecases.auth.GetCurrentUserUseCase
+import com.example.thecodecup.domain.usecases.auth.LogoutUseCase
+import com.example.thecodecup.domain.usecases.profile.UpdateUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
