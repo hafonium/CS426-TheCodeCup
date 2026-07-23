@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from typing import Optional
+from app.schemas.cart_item_schema import CartItemResponse
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -48,4 +49,5 @@ class UserUpdate(BaseModel):
 
 class UserResponse(UserBase):
     id: int
+    cart_items: list[CartItemResponse] = []
     model_config = ConfigDict(from_attributes=True)

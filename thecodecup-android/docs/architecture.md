@@ -13,9 +13,10 @@
 
 ### 3. UI Layer (`ui/`)
 - **ZERO DTO PERMISSION:** Never import or reference classes ending in `Dto` or inside `app/src/main/java/com/example/thecodecup/data/remote/`. Use Domain Models only.
+- You can use or edit any components in `app/src/main/java/com/example/thecodecup/ui/components/`
 - ViewModels must call **Domain Use Cases**, never Repositories directly, and only ViewModels can call **Domain Use Cases**.
 - No network/API error parsing logic in the UI layer. Expose state via `StateFlow`.
-
+- Add navigational logic in the UI layer via `app/src/main/java/com/example/thecodecup/ui/navigation/`
 ---
 
 ## Example Reference Files

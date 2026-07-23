@@ -25,6 +25,10 @@ import com.example.thecodecup.ui.auth.welcome.WelcomeScreen
 import com.example.thecodecup.ui.core.profile.ProfileScreen
 import com.example.thecodecup.ui.core.profile.ProfileViewModel
 import com.example.thecodecup.ui.core.splash.SplashScreen
+import com.example.thecodecup.ui.core.details.DetailScreen
+import com.example.thecodecup.ui.core.details.DetailViewModel
+import com.example.thecodecup.ui.core.cart.CartScreen
+import com.example.thecodecup.ui.core.cart.CartViewModel
 
 @Composable
 fun ScreenNavigator(
@@ -33,6 +37,21 @@ fun ScreenNavigator(
     val navController = rememberNavController()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val appInstance = context.applicationContext as App
+    val cartViewModel: CartViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                CartViewModel(
+                    appInstance.getCartItemsUseCase,
+                    appInstance.addCartItemUseCase,
+                    appInstance.updateCartItemUseCase,
+                    appInstance.updateCartQuantityUseCase,
+                    appInstance.deleteCartItemUseCase,
+                    appInstance.clearCartUseCase
+                )
+            }
+        }
+    )
 
     LaunchedEffect(authState) {
         when (authState) {
@@ -92,24 +111,60 @@ fun ScreenNavigator(
             )
         }
 
-        composable(route = Screen.Cart.route) {
-            HomeDestinationPlaceholder("Cart", onNavigateBack = navController::popBackStack)
+        composable(route = Screen.Cart.route) { backStackEntry ->
+            CartScreen(
+                viewModel = cartViewModel,
+                onNavigateBack = {
+                    if (navController.currentBackStackEntry == backStackEntry) {
+                        navController.popBackStack()
+                    }
+                },
+                onNavigateToDetails = { navController.navigate(Screen.Details.createRoute(it)) }
+            )
         }
 
-        composable(route = Screen.Rewards.route) {
-            HomeDestinationPlaceholder("Rewards", onNavigateBack = navController::popBackStack)
+        composable(route = Screen.Rewards.route) { backStackEntry ->
+            HomeDestinationPlaceholder(
+                "Rewards",
+                onNavigateBack = {
+                    if (navController.currentBackStackEntry == backStackEntry) {
+                        navController.popBackStack()
+                    }
+                }
+            )
         }
 
-        composable(route = Screen.Order.route) {
-            HomeDestinationPlaceholder("Order", onNavigateBack = navController::popBackStack)
+        composable(route = Screen.Order.route) { backStackEntry ->
+            HomeDestinationPlaceholder(
+                "Order",
+                onNavigateBack = {
+                    if (navController.currentBackStackEntry == backStackEntry) {
+                        navController.popBackStack()
+                    }
+                }
+            )
         }
 
         composable(route = Screen.Details.route) { backStackEntry ->
-            val foodId = backStackEntry.arguments?.getString("foodId")
-            HomeDestinationPlaceholder(
-                title = "Details",
-                subtitle = foodId?.let { "Coffee #$it" } ?: "Coming soon",
-                onNavigateBack = navController::popBackStack
+            val foodId = backStackEntry.arguments?.getString("foodId")?.toIntOrNull() ?: return@composable
+            val detailViewModel: DetailViewModel = viewModel(
+                key = "details-$foodId",
+                factory = viewModelFactory {
+                    initializer {
+                        val appInstance = context.applicationContext as App
+                        DetailViewModel(foodId, appInstance.getFoodDetailsUseCase)
+                    }
+                }
+            )
+            DetailScreen(
+                viewModel = detailViewModel,
+                cartViewModel = cartViewModel,
+                onNavigateBack = {
+                    if (navController.currentBackStackEntry == backStackEntry) {
+                        navController.popBackStack()
+                    }
+                },
+                onNavigateToCart = { navController.navigate(Screen.Cart.route) }
             )
         }
 
@@ -166,7 +221,7 @@ fun ScreenNavigator(
             )
         }
 
-        composable(route = Screen.Profile.route) {
+        composable(route = Screen.Profile.route) { backStackEntry ->
             val profileViewModel: ProfileViewModel = viewModel(
                 factory = viewModelFactory {
                     initializer {
@@ -189,8 +244,8 @@ fun ScreenNavigator(
                     }
                 },
                 onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Profile.route) { inclusive = true }
+                    if (navController.currentBackStackEntry == backStackEntry) {
+                        navController.popBackStack()
                     }
                 }
             )
