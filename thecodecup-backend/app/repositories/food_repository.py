@@ -5,14 +5,15 @@ from app.models.food_option_model import FoodOptionModel
 from app.schemas.food_schema import FoodCreate, FoodUpdate
 
 def get_all_food(db: Session, category: str = None) -> list[FoodModel]:
-    stmt = (
-        select(FoodModel)
-        .where(FoodModel.category == category) if category else select(FoodModel)
-        .options(
-            selectinload(FoodModel.options).selectinload(FoodOptionModel.option_types)
-        )
+    stmt = select(FoodModel)
+    
+    if category:
+        stmt = stmt.where(FoodModel.category == category)
+        
+    stmt = stmt.options(
+        selectinload(FoodModel.options).selectinload(FoodOptionModel.option_types)
     )
-    return db.scalars(stmt).all()
+    return list(db.scalars(stmt).all())
 
 def get_food_by_id(db: Session, food_id: int) -> FoodModel | None:
     stmt = (

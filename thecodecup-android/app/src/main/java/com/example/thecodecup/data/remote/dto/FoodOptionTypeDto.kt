@@ -12,3 +12,17 @@ data class FoodOptionTypeResponseDto(
     @SerializedName("price")
     val price: Double
 )
+
+data class FoodOptionTypeEditResponseDto(
+    @SerializedName("id")
+    val id: Int? = null,
+
+    @SerializedName("name")
+    val name: String,
+
+    @SerializedName("price")
+    val price: Double,
+
+    @SerializedName("is_selected")
+    val isSelected: Boolean
+)

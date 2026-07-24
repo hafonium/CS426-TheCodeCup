@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val isLoading: Boolean = true,
-    val firstName: String = "there",
+    val firstName: String = "",
     val foods: List<FoodModel> = emptyList(),
     val errorMessage: String? = null
 )

@@ -2,7 +2,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, DateTime
 from datetime import datetime
 from app.models.base import Base
-from pydantic import field_validator
 
 class RevokedTokenModel(Base):
      __tablename__ = "REVOKED_TOKENS"

@@ -14,4 +14,9 @@ class FoodOptionModel(Base):
 
     # Relationship back to parent food model
     food: Mapped["FoodModel"] = relationship("FoodModel", back_populates="options")
-    option_types: Mapped[list["FoodOptionTypeModel"]] = relationship("FoodOptionTypeModel", back_populates="option")
+    option_types: Mapped[list["FoodOptionTypeModel"]] = relationship(
+        "FoodOptionTypeModel", 
+        back_populates="option",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )

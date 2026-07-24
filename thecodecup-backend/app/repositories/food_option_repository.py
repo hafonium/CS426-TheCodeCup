@@ -5,10 +5,6 @@ from app.models.food_option_model import FoodOptionModel
 from app.schemas.food_schema import FoodCreate, FoodUpdate
 from app.schemas.food_option_schema import FoodOptionCreate, FoodOptionUpdate
 
-def get_all_food_options(db: Session) -> list[FoodOptionModel]:
-    stmt = select(FoodOptionModel)
-    return db.scalars(stmt).all()
-
 def create_food_option(db: Session, food_id: int, food_option: FoodOptionCreate):
     db_food_option = FoodOptionModel(
         food_id=food_id,

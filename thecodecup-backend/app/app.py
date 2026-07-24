@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from app.core.config import settings
 from app.api.router import api_router
-from app.models.base import Base
+from app.models import Base
 from app.core.database import engine
 from fastapi.security import OAuth2PasswordBearer
 

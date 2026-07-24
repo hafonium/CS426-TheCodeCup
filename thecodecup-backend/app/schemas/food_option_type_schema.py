@@ -17,7 +17,11 @@ class FoodOptionTypeCreate(FoodOptionTypeBase):
     )
 
 class FoodOptionTypeResponse(FoodOptionTypeBase):
+    id: int
     model_config = ConfigDict(from_attributes=True)
+
+class FoodOptionTypeEditResponse(FoodOptionTypeResponse):
+    is_selected: bool = False
 
 class FoodOptionTypeUpdate(BaseModel):
     name: Optional[str] = None
