@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 object ApiClient {
     private val API_URL = BuildConfig.API_URL
 
-    // Create a logger so you can see exactly what is being sent/received in Logcat
+    // Create a logger so we can see exactly what is being sent/received in Logcat
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -21,7 +21,7 @@ object ApiClient {
     // Build the OkHttp Client
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
-        .connectTimeout(30, TimeUnit.SECONDS) // Good practice for network calls
+        .connectTimeout(30, TimeUnit.SECONDS) 
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
