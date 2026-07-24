@@ -5,9 +5,14 @@ from app.models.base import Base
 class CartItemFoodOptionTypeModel(Base):
     __tablename__ = "CART_ITEM_FOOD_OPTION_TYPES"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    cart_item_id: Mapped[int] = mapped_column(ForeignKey("CART_ITEMS.id", ondelete="CASCADE"), index=True)
-    food_option_type_id: Mapped[int] = mapped_column(ForeignKey("FOOD_OPTION_TYPES.id", ondelete="CASCADE"), index=True)
+    cart_item_id: Mapped[int] = mapped_column(
+        ForeignKey("CART_ITEMS.id", ondelete="CASCADE"), 
+        primary_key=True
+    )
+    food_option_type_id: Mapped[int] = mapped_column(
+        ForeignKey("FOOD_OPTION_TYPES.id", ondelete="CASCADE"),
+        primary_key=True
+    )
 
     # Relationship to the CartItemModel
     cart_item: Mapped["CartItemModel"] = relationship(
