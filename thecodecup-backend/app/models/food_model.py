@@ -29,3 +29,10 @@ class FoodModel(Base):
         cascade="all, delete-orphan",
         passive_deletes=True
     )
+
+    order_items: Mapped[list["OrderItemModel"]] = relationship(
+        "OrderItemModel",
+        back_populates="food",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )

@@ -29,6 +29,9 @@ import com.example.thecodecup.ui.core.details.DetailScreen
 import com.example.thecodecup.ui.core.details.DetailViewModel
 import com.example.thecodecup.ui.core.cart.CartScreen
 import com.example.thecodecup.ui.core.cart.CartViewModel
+import com.example.thecodecup.ui.core.order.OrderScreen
+import com.example.thecodecup.ui.core.order.OrderSuccessScreen
+import com.example.thecodecup.ui.core.order.OrderViewModel
 
 @Composable
 fun ScreenNavigator(
@@ -47,7 +50,9 @@ fun ScreenNavigator(
                     appInstance.updateCartItemUseCase,
                     appInstance.updateCartQuantityUseCase,
                     appInstance.deleteCartItemUseCase,
-                    appInstance.clearCartUseCase
+                    appInstance.clearCartUseCase,
+                    appInstance.getCurrentUserUseCase,
+                    appInstance.createOrderUseCase
                 )
             }
         }
@@ -90,7 +95,7 @@ fun ScreenNavigator(
             )
         }
 
-        composable(route = Screen.Home.route) {
+        composable(route = Screen.Home.route) { backStackEntry ->
             val homeViewModel: HomeViewModel = viewModel(
                 factory = viewModelFactory {
                     initializer {
@@ -99,6 +104,15 @@ fun ScreenNavigator(
                     }
                 }
             )
+            val refreshAfterProfileUpdate by backStackEntry.savedStateHandle
+                .getStateFlow(PROFILE_UPDATED_KEY, false)
+                .collectAsStateWithLifecycle()
+            LaunchedEffect(refreshAfterProfileUpdate) {
+                if (refreshAfterProfileUpdate) {
+                    homeViewModel.refresh()
+                    backStackEntry.savedStateHandle[PROFILE_UPDATED_KEY] = false
+                }
+            }
             HomeScreen(
                 viewModel = homeViewModel,
                 onNavigateToProfile = {
@@ -119,7 +133,12 @@ fun ScreenNavigator(
                         navController.popBackStack()
                     }
                 },
-                onNavigateToDetails = { navController.navigate(Screen.Details.createRoute(it)) }
+                onNavigateToDetails = { navController.navigate(Screen.Details.createRoute(it)) },
+                onOrderSuccess = {
+                    navController.navigate(Screen.OrderSuccess.route) {
+                        popUpTo(Screen.Cart.route) { inclusive = true }
+                    }
+                }
             )
         }
 
@@ -134,12 +153,35 @@ fun ScreenNavigator(
             )
         }
 
-        composable(route = Screen.Order.route) { backStackEntry ->
-            HomeDestinationPlaceholder(
-                "Order",
-                onNavigateBack = {
-                    if (navController.currentBackStackEntry == backStackEntry) {
-                        navController.popBackStack()
+        composable(route = Screen.Order.route) {
+            val orderViewModel: OrderViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        OrderViewModel(
+                            appInstance.getOrdersUseCase,
+                            appInstance.completeOrderUseCase
+                        )
+                    }
+                }
+            )
+            OrderScreen(
+                viewModel = orderViewModel,
+                onHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                onRewards = { navController.navigate(Screen.Rewards.route) },
+                onFood = { navController.navigate(Screen.Details.createRoute(it)) }
+            )
+        }
+
+        composable(route = Screen.OrderSuccess.route) {
+            OrderSuccessScreen(
+                onTrackOrder = {
+                    navController.navigate(Screen.Order.route) {
+                        popUpTo(Screen.OrderSuccess.route) { inclusive = true }
                     }
                 }
             )
@@ -247,8 +289,16 @@ fun ScreenNavigator(
                     if (navController.currentBackStackEntry == backStackEntry) {
                         navController.popBackStack()
                     }
+                },
+                onProfileUpdated = {
+                    runCatching { navController.getBackStackEntry(Screen.Home.route) }
+                        .getOrNull()
+                        ?.savedStateHandle
+                        ?.set(PROFILE_UPDATED_KEY, true)
                 }
             )
         }
     }
 }
+
+private const val PROFILE_UPDATED_KEY = "profile_updated"

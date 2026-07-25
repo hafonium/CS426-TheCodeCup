@@ -26,7 +26,21 @@ def get_all_cart_items(db: Session, user_id: int) -> List[CartItemModel]:
     )
     return list(db.scalars(stmt).unique().all())
 
-
+def get_cart_item_by_id(db: Session, cart_item_id: int) -> Optional[CartItemModel]:
+    """
+    Retrieves a specific cart item by its ID.
+    Pre-loads associated food and option type data for detailed view.
+    """
+    stmt = (
+        select(CartItemModel)
+        .where(CartItemModel.id == cart_item_id)
+        .options(
+            joinedload(CartItemModel.food),
+            selectinload(CartItemModel.option_types).joinedload(CartItemFoodOptionTypeModel.option_type)
+        )
+    )
+    return db.scalars(stmt).first()
+    
 def get_cart_item_for_edit(db: Session, cart_item_id: int) -> Optional[CartItemEditResponse]:
     """
     Retrieves a cart item along with the food's full option menu.

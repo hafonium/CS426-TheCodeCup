@@ -1,21 +1,34 @@
 package com.example.thecodecup.ui
 
 import android.app.Application
+import com.example.thecodecup.BuildConfig
 import com.example.thecodecup.data.local.prefs.AuthPreferences
 import com.example.thecodecup.data.repositories.AuthRepositoryImpl
 import com.example.thecodecup.data.repositories.UserRepositoryImpl
 import com.example.thecodecup.data.repositories.FoodRepositoryImpl
 import com.example.thecodecup.data.repositories.CartRepositoryImpl
+import com.example.thecodecup.data.repositories.OrderRepositoryImpl
 import com.example.thecodecup.domain.repositories.AuthRepository
 import com.example.thecodecup.domain.repositories.UserRepository
 import com.example.thecodecup.domain.repositories.FoodRepository
 import com.example.thecodecup.domain.repositories.CartRepository
+import com.example.thecodecup.domain.repositories.OrderRepository
 import com.example.thecodecup.domain.usecases.auth.GetCurrentUserUseCase
 import com.example.thecodecup.domain.usecases.auth.LoginUseCase
 import com.example.thecodecup.domain.usecases.auth.LogoutUseCase
 import com.example.thecodecup.domain.usecases.auth.RegisterUseCase
+import org.osmdroid.config.Configuration
 
 class App(): Application() {
+    override fun onCreate() {
+        super.onCreate()
+        Configuration.getInstance().apply {
+            load(applicationContext, getSharedPreferences("openstreetmap", MODE_PRIVATE))
+            userAgentValue =
+                "TheCodeCupAndroid/${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})"
+        }
+    }
+
     private val authPrefs by lazy { AuthPreferences(applicationContext) }
 
     // Repositories
@@ -23,6 +36,7 @@ class App(): Application() {
     val userRepository: UserRepository by lazy { UserRepositoryImpl(authPrefs) }
     val foodRepository: FoodRepository by lazy { FoodRepositoryImpl() }
     val cartRepository: CartRepository by lazy { CartRepositoryImpl(authPrefs) }
+    val orderRepository: OrderRepository by lazy { OrderRepositoryImpl(authPrefs) }
 
     // Use Cases
     val loginUseCase by lazy { LoginUseCase(authRepository, authPrefs) }
@@ -37,5 +51,8 @@ class App(): Application() {
     val updateCartQuantityUseCase by lazy { com.example.thecodecup.domain.usecases.cart.UpdateCartQuantityUseCase(cartRepository) }
     val deleteCartItemUseCase by lazy { com.example.thecodecup.domain.usecases.cart.DeleteCartItemUseCase(cartRepository) }
     val clearCartUseCase by lazy { com.example.thecodecup.domain.usecases.cart.ClearCartUseCase(cartRepository) }
+    val createOrderUseCase by lazy { com.example.thecodecup.domain.usecases.order.CreateOrderUseCase(orderRepository) }
+    val getOrdersUseCase by lazy { com.example.thecodecup.domain.usecases.order.GetOrdersUseCase(orderRepository) }
+    val completeOrderUseCase by lazy { com.example.thecodecup.domain.usecases.order.CompleteOrderUseCase(orderRepository) }
     val updateUserUseCase by lazy { com.example.thecodecup.domain.usecases.profile.UpdateUserUseCase(userRepository) }
 }
