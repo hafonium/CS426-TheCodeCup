@@ -16,14 +16,16 @@ sealed class ProfileUiState {
     object Loading : ProfileUiState()
     data class LoggedIn(
         val user: UserResponseModel,
-        val passwordUpdateVersion: Long = 0
+        val passwordUpdateVersion: Long = 0,
+        val profileUpdateVersion: Long = 0
     ) : ProfileUiState()
     object LoggedOut : ProfileUiState()
     object Updated : ProfileUiState()
     data class Error(
         val message: String,
         val user: UserResponseModel?,
-        val passwordUpdateVersion: Long = 0
+        val passwordUpdateVersion: Long = 0,
+        val profileUpdateVersion: Long = 0
     ) : ProfileUiState()
 }
 
@@ -79,6 +81,18 @@ class ProfileViewModel(
             is ProfileUiState.Error -> state.passwordUpdateVersion
             else -> 0
         }
+        val profileUpdateVersion = when (val state = _uiState.value) {
+            is ProfileUiState.LoggedIn -> state.profileUpdateVersion
+            is ProfileUiState.Error -> state.profileUpdateVersion
+            else -> 0
+        }
+        val profileInformationChanged = currentUser != null && (
+            currentUser.email != email ||
+                currentUser.fullName != fullName ||
+                currentUser.phoneNumber != phone ||
+                currentUser.avatarUrl != avatarUrl ||
+                currentUser.address != address
+            )
 
 //        _uiState.value = ProfileUiState.Loading
 
@@ -102,7 +116,8 @@ class ProfileViewModel(
                             passwordUpdateVersion + 1
                         } else {
                             passwordUpdateVersion
-                        }
+                        },
+                        profileUpdateVersion = profileUpdateVersion + if (profileInformationChanged) 1 else 0
                     )
                 } else {
                     fetchCurrentUser() // Fallback only if currentUser was somehow null
@@ -112,7 +127,8 @@ class ProfileViewModel(
                 _uiState.value = ProfileUiState.Error(
                     message = error.message ?: "Unknown error",
                     user = currentUser,
-                    passwordUpdateVersion = passwordUpdateVersion
+                    passwordUpdateVersion = passwordUpdateVersion,
+                    profileUpdateVersion = profileUpdateVersion
                 )
             }
         }

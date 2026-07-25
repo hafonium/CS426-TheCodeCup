@@ -9,7 +9,11 @@ def get_food_option_types_by_option_id(db: Session, food_option_id: int) -> List
     """
     Fetches all option types belonging to a specific food option group.
     """
-    stmt = select(FoodOptionTypeModel).where(FoodOptionTypeModel.food_option_id == food_option_id)
+    stmt = (
+        select(FoodOptionTypeModel)
+        .where(FoodOptionTypeModel.food_option_id == food_option_id)
+        .order_by(FoodOptionTypeModel.price.asc())
+    )
     return list(db.scalars(stmt).all())
 
 

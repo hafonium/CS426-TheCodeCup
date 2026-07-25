@@ -31,10 +31,12 @@ fun CartScreen(
     viewModel: CartViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToDetails: (Int) -> Unit,
+    onOrderSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var editing by remember { mutableStateOf<CartItemModel?>(null) }
+    var showAddressDialog by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) { viewModel.refresh() }
@@ -43,6 +45,12 @@ fun CartScreen(
         (state.errorMessage ?: state.message)?.let {
             snackbar.showSnackbar(it)
             viewModel.clearMessage()
+        }
+    }
+    LaunchedEffect(state.orderCreated) {
+        if (state.orderCreated) {
+            viewModel.consumeOrderCreated()
+            onOrderSuccess()
         }
     }
 
@@ -70,7 +78,11 @@ fun CartScreen(
                         Text("Total Price", color = Color.Gray, fontSize = 12.sp)
                         Text("$${"%.2f".format(state.totalPrice)}", color = CoffeeNavy, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     }
-                    Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = CoffeeBlue)) {
+                    Button(
+                        onClick = { showAddressDialog = true },
+                        enabled = state.selectedItemIds.isNotEmpty() && !state.isCheckingOut,
+                        colors = ButtonDefaults.buttonColors(containerColor = CoffeeBlue)
+                    ) {
                         Icon(Icons.Outlined.ShoppingCartCheckout, null)
                         Spacer(Modifier.width(8.dp))
                         Text("Checkout")
@@ -92,9 +104,23 @@ fun CartScreen(
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    item {
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                "${state.selectedItemIds.size} of ${state.items.size} selected",
+                                Modifier.weight(1f),
+                                color = CoffeeNavy,
+                                fontSize = 13.sp
+                            )
+                            TextButton(onClick = viewModel::selectAll) { Text("Select all") }
+                            TextButton(onClick = viewModel::deselectAll) { Text("Deselect all") }
+                        }
+                    }
                     items(state.items, key = { it.id }) { item ->
                         CartItemRow(
                             item = item,
+                            selected = item.id in state.selectedItemIds,
+                            onToggleSelection = { viewModel.toggleSelection(item.id) },
                             onDelete = viewModel::delete,
                             onEdit = { editing = item },
                             onDetails = onNavigateToDetails,
@@ -104,6 +130,18 @@ fun CartScreen(
                 }
             }
         }
+    }
+
+    if (showAddressDialog) {
+        CheckoutAddressDialog(
+            profileAddress = state.profileAddress,
+            isLoading = state.isCheckingOut,
+            onDismiss = { if (!state.isCheckingOut) showAddressDialog = false },
+            onConfirm = {
+                viewModel.checkout(it)
+                showAddressDialog = false
+            }
+        )
     }
 
     editing?.let { item ->
@@ -121,6 +159,8 @@ fun CartScreen(
 @Composable
 private fun CartItemRow(
     item: CartItemModel,
+    selected: Boolean,
+    onToggleSelection: () -> Unit,
     onDelete: (Int) -> Unit,
     onEdit: () -> Unit,
     onDetails: (Int) -> Unit,
@@ -148,6 +188,11 @@ private fun CartItemRow(
                 .clickable { onDetails(item.food.id) }.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Checkbox(
+                checked = selected,
+                onCheckedChange = { onToggleSelection() },
+                colors = CheckboxDefaults.colors(checkedColor = CoffeeBlue)
+            )
             AsyncImage(
                 model = item.food.imageUrl, contentDescription = item.food.name, contentScale = ContentScale.Fit,
                 modifier = Modifier.size(76.dp).padding(4.dp)
@@ -164,6 +209,81 @@ private fun CartItemRow(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CheckoutAddressDialog(
+    profileAddress: String,
+    isLoading: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var useProfileAddress by remember(profileAddress) { mutableStateOf(profileAddress.isNotBlank()) }
+    var customAddress by remember { mutableStateOf("") }
+    var showMapPicker by remember { mutableStateOf(false) }
+    val address = if (useProfileAddress) profileAddress else customAddress
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Delivery address") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                if (profileAddress.isNotBlank()) {
+                    Row(
+                        Modifier.fillMaxWidth().clickable { useProfileAddress = true },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = useProfileAddress, onClick = { useProfileAddress = true })
+                        Column {
+                            Text("Use profile address", fontWeight = FontWeight.SemiBold)
+                            Text(profileAddress, color = Color.Gray, fontSize = 12.sp)
+                        }
+                    }
+                }
+                Row(
+                    Modifier.fillMaxWidth().clickable { useProfileAddress = false },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(selected = !useProfileAddress, onClick = { useProfileAddress = false })
+                    Text("Enter another address", fontWeight = FontWeight.SemiBold)
+                }
+                if (!useProfileAddress) {
+                    OutlinedTextField(
+                        value = customAddress,
+                        onValueChange = { customAddress = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Delivery address") },
+                        minLines = 2
+                    )
+                    OutlinedButton(
+                        onClick = { showMapPicker = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Outlined.Map, null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Select on map")
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(address) }, enabled = address.isNotBlank() && !isLoading) {
+                Text(if (isLoading) "Placing order..." else "Place order")
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss, enabled = !isLoading) { Text("Cancel") } }
+    )
+
+    if (showMapPicker) {
+        MapAddressPickerDialog(
+            initialAddress = customAddress,
+            onDismiss = { showMapPicker = false },
+            onAddressSelected = {
+                customAddress = it
+                useProfileAddress = false
+                showMapPicker = false
+            }
+        )
     }
 }
 

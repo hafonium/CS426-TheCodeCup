@@ -14,7 +14,8 @@ fun ProfileScreen(
     viewModel: ProfileViewModel,
     modifier: Modifier = Modifier,
     onNavigateToWelcome: () -> Unit = {},
-    onNavigateToHome : () -> Unit = { }
+    onNavigateToHome : () -> Unit = { },
+    onProfileUpdated: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -27,6 +28,11 @@ fun ProfileScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchCurrentUser()
+    }
+
+    val profileUpdateVersion = (uiState as? ProfileUiState.LoggedIn)?.profileUpdateVersion ?: 0
+    LaunchedEffect(profileUpdateVersion) {
+        if (profileUpdateVersion > 0) onProfileUpdated()
     }
 
     ProfileScreenContent(

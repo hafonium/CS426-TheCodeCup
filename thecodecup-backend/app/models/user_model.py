@@ -25,6 +25,13 @@ class UserModel(Base):
         passive_deletes=True
     )
 
+    orders: Mapped[list["OrderModel"]] = relationship(
+        "OrderModel",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
+
     @validates("phone_number")
     def validate_phone_number(self, key: str, value: str) -> str:
         if not value:
