@@ -120,6 +120,17 @@ private fun FoodCard(food: FoodModel, onClick: () -> Unit) {
             )
         }
         Text(food.name, color = CoffeeNavy, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text("$${"%.2f".format(food.price)}", color = CoffeeBlue, fontSize = 13.sp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text("$${"%.2f".format(food.price)}", color = CoffeeBlue, fontSize = 13.sp)
+            Text(
+                "${food.rewardPoint} pts",
+                color = CoffeeNavy,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }

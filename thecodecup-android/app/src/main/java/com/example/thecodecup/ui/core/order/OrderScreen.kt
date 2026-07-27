@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -100,6 +101,7 @@ private fun OrderCard(
     onFood: (Int) -> Unit
 ) {
     var expanded by rememberSaveable(order.id) { mutableStateOf(false) }
+    val hasRewardItem = order.items.any { it.isRewardItem() }
     Card(colors = CardDefaults.cardColors(containerColor = CoffeeCard), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -109,7 +111,19 @@ private fun OrderCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 13.sp
                 )
-                Text("$${"%.2f".format(order.totalPrice)}", color = CoffeeNavy, fontWeight = FontWeight.Bold)
+                if (hasRewardItem) {
+                    FreePrice(
+                        originalPrice = "$${"%.2f".format(order.totalPrice)}",
+                        color = CoffeeNavy,
+                        fontWeight = FontWeight.Bold
+                    )
+                } else {
+                    Text(
+                        "$${"%.2f".format(order.totalPrice)}",
+                        color = CoffeeNavy,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
             Spacer(Modifier.height(8.dp))
             Text(
@@ -141,7 +155,14 @@ private fun OrderCard(
                                 Text(item.name, color = CoffeeNavy, fontWeight = FontWeight.SemiBold)
                                 Text(item.description, color = Color.Gray, fontSize = 11.sp, maxLines = 2)
                             }
-                            Text("${item.quantity} × $${"%.2f".format(item.price)}", fontSize = 12.sp)
+                            if (item.isRewardItem()) {
+                                FreePrice(
+                                    originalPrice = "${item.quantity} × $${"%.2f".format(item.price)}",
+                                    fontSize = 12.sp
+                                )
+                            } else {
+                                Text("${item.quantity} × $${"%.2f".format(item.price)}", fontSize = 12.sp)
+                            }
                             Icon(Icons.Outlined.ChevronRight, "View food")
                         }
                     }
@@ -172,3 +193,34 @@ private fun OrderCard(
         }
     }
 }
+
+@Composable
+private fun FreePrice(
+    originalPrice: String,
+    color: Color = Color.Unspecified,
+    fontSize: androidx.compose.ui.unit.TextUnit = androidx.compose.ui.unit.TextUnit.Unspecified,
+    fontWeight: FontWeight? = null
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = originalPrice,
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            textDecoration = TextDecoration.LineThrough
+        )
+        Text(
+            text = "$0.00",
+            color = CoffeeBlue,
+            fontSize = fontSize,
+            fontWeight = fontWeight ?: FontWeight.SemiBold
+        )
+    }
+}
+
+private fun com.example.thecodecup.domain.models.OrderItemModel.isRewardItem(): Boolean =
+    description.trim().equals("Gachapon Reward", ignoreCase = true) ||
+        description.trim().equals("Redeemed Reward", ignoreCase = true)

@@ -110,6 +110,12 @@ private fun DetailContent(food: FoodModel, onAddToCart: (Int, Int, List<Int>) ->
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(food.name, color = CoffeeNavy, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = "${food.rewardPoint} reward points",
+                    color = CoffeeBlue,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
                 if (food.description.isNotBlank()) {
                     var isDescriptionOverflowing by remember(food.id, food.description) {
                         mutableStateOf(false)
