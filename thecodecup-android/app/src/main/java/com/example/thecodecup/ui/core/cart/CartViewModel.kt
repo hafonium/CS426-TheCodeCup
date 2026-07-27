@@ -72,7 +72,7 @@ class CartViewModel(
                     _uiState.value = _uiState.value.copy(
                         items = _uiState.value.items.filterNot { item -> item.id in selected },
                         selectedItemIds = emptySet(),
-                        isCheckingOut = false,
+                        isCheckingOut = true,
                         orderCreated = true
                     )
                 },
@@ -82,7 +82,10 @@ class CartViewModel(
     }
 
     fun consumeOrderCreated() {
-        _uiState.value = _uiState.value.copy(orderCreated = false)
+        _uiState.value = _uiState.value.copy(
+            isCheckingOut = false,
+            orderCreated = false
+        )
     }
 
     fun add(foodId: Int, quantity: Int, optionTypeIds: List<Int>) {

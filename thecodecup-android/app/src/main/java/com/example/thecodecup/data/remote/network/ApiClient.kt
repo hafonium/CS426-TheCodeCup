@@ -5,6 +5,8 @@ import com.example.thecodecup.data.remote.api.AuthApiService
 import com.example.thecodecup.data.remote.api.CartApiService
 import com.example.thecodecup.data.remote.api.FoodApiService
 import com.example.thecodecup.data.remote.api.OrderApiService
+import com.example.thecodecup.data.remote.api.PromotionApiService
+import com.example.thecodecup.data.remote.api.RedeemRewardApiService
 import com.example.thecodecup.data.remote.api.UserApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -52,5 +54,13 @@ object ApiClient {
 
     val orderApiService: OrderApiService by lazy {
         retrofit.create(OrderApiService::class.java)
+    }
+
+    val redeemRewardApiService: RedeemRewardApiService by lazy {
+        retrofit.create(RedeemRewardApiService::class.java)
+    }
+
+    val promotionApiService: PromotionApiService by lazy {
+        retrofit.create(PromotionApiService::class.java)
     }
 }

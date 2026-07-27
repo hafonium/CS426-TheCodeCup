@@ -2,6 +2,7 @@ from typing import Optional
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, validates, relationship
 from app.models.base import Base
+from typing import List
 import phonenumbers
 
 class UserModel(Base):
@@ -30,6 +31,11 @@ class UserModel(Base):
         back_populates="user",
         cascade="all, delete-orphan",
         passive_deletes=True
+    )
+
+    gained_rewards: Mapped[List["GainedRewardModel"]] = relationship(
+        "GainedRewardModel",  
+        back_populates="user",  
     )
 
     @validates("phone_number")

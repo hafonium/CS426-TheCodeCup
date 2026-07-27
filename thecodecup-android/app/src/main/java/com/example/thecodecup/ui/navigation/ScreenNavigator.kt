@@ -16,7 +16,6 @@ import com.example.thecodecup.ui.auth.auth.AuthState
 import com.example.thecodecup.ui.auth.auth.AuthViewModel
 import com.example.thecodecup.ui.core.home.HomeScreen
 import com.example.thecodecup.ui.core.home.HomeViewModel
-import com.example.thecodecup.ui.core.home.HomeDestinationPlaceholder
 import com.example.thecodecup.ui.auth.login.LoginScreen
 import com.example.thecodecup.ui.auth.login.LoginViewModel
 import com.example.thecodecup.ui.auth.register.RegisterScreen
@@ -32,6 +31,10 @@ import com.example.thecodecup.ui.core.cart.CartViewModel
 import com.example.thecodecup.ui.core.order.OrderScreen
 import com.example.thecodecup.ui.core.order.OrderSuccessScreen
 import com.example.thecodecup.ui.core.order.OrderViewModel
+import com.example.thecodecup.ui.core.rewards.RewardScreen
+import com.example.thecodecup.ui.core.rewards.RewardViewModel
+import com.example.thecodecup.ui.core.rewards.RedeemRewardScreen
+import com.example.thecodecup.ui.core.rewards.RedeemRewardViewModel
 
 @Composable
 fun ScreenNavigator(
@@ -100,17 +103,25 @@ fun ScreenNavigator(
                 factory = viewModelFactory {
                     initializer {
                         val appInstance = context.applicationContext as App
-                        HomeViewModel(appInstance.getCurrentUserUseCase, appInstance.getFoodsUseCase)
+                        HomeViewModel(
+                            appInstance.getCurrentUserUseCase,
+                            appInstance.getFoodsUseCase,
+                            appInstance.getPromotionUseCase
+                        )
                     }
                 }
             )
             val refreshAfterProfileUpdate by backStackEntry.savedStateHandle
                 .getStateFlow(PROFILE_UPDATED_KEY, false)
                 .collectAsStateWithLifecycle()
-            LaunchedEffect(refreshAfterProfileUpdate) {
-                if (refreshAfterProfileUpdate) {
+            val refreshAfterOrderCompletion by backStackEntry.savedStateHandle
+                .getStateFlow(ORDER_COMPLETED_KEY, false)
+                .collectAsStateWithLifecycle()
+            LaunchedEffect(refreshAfterProfileUpdate, refreshAfterOrderCompletion) {
+                if (refreshAfterProfileUpdate || refreshAfterOrderCompletion) {
                     homeViewModel.refresh()
                     backStackEntry.savedStateHandle[PROFILE_UPDATED_KEY] = false
+                    backStackEntry.savedStateHandle[ORDER_COMPLETED_KEY] = false
                 }
             }
             HomeScreen(
@@ -143,12 +154,68 @@ fun ScreenNavigator(
         }
 
         composable(route = Screen.Rewards.route) { backStackEntry ->
-            HomeDestinationPlaceholder(
-                "Rewards",
-                onNavigateBack = {
+            val rewardViewModel: RewardViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        RewardViewModel(
+                            appInstance.getPromotionUseCase,
+                            appInstance.getGainedRewardsUseCase,
+                            appInstance.getFoodsUseCase,
+                            appInstance.getCurrentUserUseCase,
+                            appInstance.useGachaponUseCase
+                        )
+                    }
+                }
+            )
+            val refreshRewards by backStackEntry.savedStateHandle
+                .getStateFlow(REWARDS_UPDATED_KEY, false)
+                .collectAsStateWithLifecycle()
+            LaunchedEffect(refreshRewards) {
+                if (refreshRewards) {
+                    rewardViewModel.refresh()
+                    backStackEntry.savedStateHandle[REWARDS_UPDATED_KEY] = false
+                }
+            }
+            RewardScreen(
+                viewModel = rewardViewModel,
+                onHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                onOrder = { navController.navigate(Screen.Order.route) },
+                onRedeem = { navController.navigate(Screen.RedeemRewards.route) },
+                onFood = { navController.navigate(Screen.Details.createRoute(it)) }
+            )
+        }
+
+        composable(route = Screen.RedeemRewards.route) { backStackEntry ->
+            val redeemViewModel: RedeemRewardViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        RedeemRewardViewModel(
+                            appInstance.getRedeemRewardsUseCase,
+                            appInstance.getPromotionUseCase,
+                            appInstance.getCurrentUserUseCase,
+                            appInstance.redeemRewardUseCase
+                        )
+                    }
+                }
+            )
+            RedeemRewardScreen(
+                viewModel = redeemViewModel,
+                onBack = {
                     if (navController.currentBackStackEntry == backStackEntry) {
                         navController.popBackStack()
                     }
+                },
+                onFood = { navController.navigate(Screen.Details.createRoute(it)) },
+                onRedeemed = {
+                    runCatching { navController.getBackStackEntry(Screen.Rewards.route) }
+                        .getOrNull()
+                        ?.savedStateHandle
+                        ?.set(REWARDS_UPDATED_KEY, true)
                 }
             )
         }
@@ -173,7 +240,17 @@ fun ScreenNavigator(
                     }
                 },
                 onRewards = { navController.navigate(Screen.Rewards.route) },
-                onFood = { navController.navigate(Screen.Details.createRoute(it)) }
+                onFood = { navController.navigate(Screen.Details.createRoute(it)) },
+                onOrderCompleted = {
+                    runCatching { navController.getBackStackEntry(Screen.Home.route) }
+                        .getOrNull()
+                        ?.savedStateHandle
+                        ?.set(ORDER_COMPLETED_KEY, true)
+                    runCatching { navController.getBackStackEntry(Screen.Rewards.route) }
+                        .getOrNull()
+                        ?.savedStateHandle
+                        ?.set(REWARDS_UPDATED_KEY, true)
+                }
             )
         }
 
@@ -302,3 +379,5 @@ fun ScreenNavigator(
 }
 
 private const val PROFILE_UPDATED_KEY = "profile_updated"
+private const val REWARDS_UPDATED_KEY = "rewards_updated"
+private const val ORDER_COMPLETED_KEY = "order_completed"

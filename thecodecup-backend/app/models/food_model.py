@@ -36,3 +36,11 @@ class FoodModel(Base):
         cascade="all, delete-orphan",
         passive_deletes=True
     )
+
+    redeem_rewards: Mapped[list["RedeemRewardModel"]] = relationship(
+        "RedeemRewardModel", back_populates="food"  
+    )
+
+    gained_rewards: Mapped[list["GainedRewardModel"]] = relationship(
+        "GainedRewardModel", back_populates="food" 
+    )

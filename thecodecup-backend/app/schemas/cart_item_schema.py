@@ -38,3 +38,8 @@ class CartItemEditResponse(BaseModel):
     options: List[FoodOptionEditResponse] = []  
 
     model_config = ConfigDict(from_attributes=True)
+
+class CartItemCreateForPromotion(BaseModel):
+    food_id: int
+    order_id: int
+    description: str

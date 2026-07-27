@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.thecodecup.domain.models.FoodModel
 import com.example.thecodecup.domain.usecases.auth.GetCurrentUserUseCase
 import com.example.thecodecup.domain.usecases.home.GetFoodsUseCase
+import com.example.thecodecup.domain.usecases.rewards.GetPromotionUseCase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,12 +16,14 @@ data class HomeUiState(
     val isLoading: Boolean = true,
     val firstName: String = "",
     val foods: List<FoodModel> = emptyList(),
+    val loyaltyCount: Int = 0,
     val errorMessage: String? = null
 )
 
 class HomeViewModel(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val getFoodsUseCase: GetFoodsUseCase
+    private val getFoodsUseCase: GetFoodsUseCase,
+    private val getPromotionUseCase: GetPromotionUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -32,12 +35,15 @@ class HomeViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             val userResult = async { getCurrentUserUseCase() }
             val foodResult = async { getFoodsUseCase() }
+            val promotionResult = async { getPromotionUseCase() }
             val user = userResult.await()
             val foods = foodResult.await()
+            val promotion = promotionResult.await()
             _uiState.value = HomeUiState(
                 isLoading = false,
                 firstName = user.getOrNull()?.fullName?.trim()?.substringBefore(" ")?.takeIf { it.isNotBlank() } ?: "there",
                 foods = foods.getOrDefault(emptyList()),
+                loyaltyCount = promotion.getOrNull()?.loyaltyCount ?: 0,
                 errorMessage = foods.exceptionOrNull()?.message
             )
         }

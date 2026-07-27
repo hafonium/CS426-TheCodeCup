@@ -8,11 +8,13 @@ import com.example.thecodecup.data.repositories.UserRepositoryImpl
 import com.example.thecodecup.data.repositories.FoodRepositoryImpl
 import com.example.thecodecup.data.repositories.CartRepositoryImpl
 import com.example.thecodecup.data.repositories.OrderRepositoryImpl
+import com.example.thecodecup.data.repositories.PromotionRepositoryImpl
 import com.example.thecodecup.domain.repositories.AuthRepository
 import com.example.thecodecup.domain.repositories.UserRepository
 import com.example.thecodecup.domain.repositories.FoodRepository
 import com.example.thecodecup.domain.repositories.CartRepository
 import com.example.thecodecup.domain.repositories.OrderRepository
+import com.example.thecodecup.domain.repositories.PromotionRepository
 import com.example.thecodecup.domain.usecases.auth.GetCurrentUserUseCase
 import com.example.thecodecup.domain.usecases.auth.LoginUseCase
 import com.example.thecodecup.domain.usecases.auth.LogoutUseCase
@@ -37,6 +39,7 @@ class App(): Application() {
     val foodRepository: FoodRepository by lazy { FoodRepositoryImpl() }
     val cartRepository: CartRepository by lazy { CartRepositoryImpl(authPrefs) }
     val orderRepository: OrderRepository by lazy { OrderRepositoryImpl(authPrefs) }
+    val promotionRepository: PromotionRepository by lazy { PromotionRepositoryImpl(authPrefs) }
 
     // Use Cases
     val loginUseCase by lazy { LoginUseCase(authRepository, authPrefs) }
@@ -55,4 +58,9 @@ class App(): Application() {
     val getOrdersUseCase by lazy { com.example.thecodecup.domain.usecases.order.GetOrdersUseCase(orderRepository) }
     val completeOrderUseCase by lazy { com.example.thecodecup.domain.usecases.order.CompleteOrderUseCase(orderRepository) }
     val updateUserUseCase by lazy { com.example.thecodecup.domain.usecases.profile.UpdateUserUseCase(userRepository) }
+    val getPromotionUseCase by lazy { com.example.thecodecup.domain.usecases.rewards.GetPromotionUseCase(promotionRepository) }
+    val getGainedRewardsUseCase by lazy { com.example.thecodecup.domain.usecases.rewards.GetGainedRewardsUseCase(promotionRepository) }
+    val getRedeemRewardsUseCase by lazy { com.example.thecodecup.domain.usecases.rewards.GetRedeemRewardsUseCase(promotionRepository) }
+    val redeemRewardUseCase by lazy { com.example.thecodecup.domain.usecases.rewards.RedeemRewardUseCase(promotionRepository) }
+    val useGachaponUseCase by lazy { com.example.thecodecup.domain.usecases.rewards.UseGachaponUseCase(promotionRepository) }
 }

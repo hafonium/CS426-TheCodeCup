@@ -1,9 +1,11 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, insert
+from sqlalchemy import select
 from app.models.user_model import UserModel
 from app.schemas.user_schema import UserCreate, UserUpdate
+from app.schemas.promotion_schema import PromotionCreate
 from app.core.security import get_password_hash, verify_password
 from app.core.exceptions import EmailAlreadyExistsException, PasswordMismatchException
+from app.repositories.promotion_repository import create_promotion
 
 def get_all_users(db: Session) -> list[UserModel]:
     stmt = select(UserModel)
@@ -35,6 +37,8 @@ def create_user(db: Session, user: UserCreate):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
+
+        create_promotion(db, promotion=PromotionCreate(user_id=db_user.id))
     except Exception as e:
         db.rollback()
         raise e
