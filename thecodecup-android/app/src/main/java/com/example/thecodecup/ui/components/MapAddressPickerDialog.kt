@@ -1,4 +1,4 @@
-package com.example.thecodecup.ui.core.cart
+package com.example.thecodecup.ui.components
 
 import android.Manifest
 import android.content.Context
@@ -31,7 +31,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
 import java.util.Locale
 
 @Composable
-internal fun MapAddressPickerDialog(
+fun MapAddressPickerDialog(
     initialAddress: String,
     onDismiss: () -> Unit,
     onAddressSelected: (String) -> Unit

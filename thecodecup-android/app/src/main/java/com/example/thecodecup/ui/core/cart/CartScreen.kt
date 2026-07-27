@@ -22,6 +22,7 @@ import coil.compose.AsyncImage
 import com.example.thecodecup.domain.models.CartItemModel
 import com.example.thecodecup.domain.models.FoodOptionTypeModel
 import com.example.thecodecup.ui.components.buttons.BackButton
+import com.example.thecodecup.ui.components.DeliveryAddressDialog
 import com.example.thecodecup.ui.theme.CoffeeBlue
 import com.example.thecodecup.ui.theme.CoffeeCard
 import com.example.thecodecup.ui.theme.CoffeeNavy
@@ -49,9 +50,31 @@ fun CartScreen(
     }
     LaunchedEffect(state.orderCreated) {
         if (state.orderCreated) {
-            viewModel.consumeOrderCreated()
             onOrderSuccess()
+            viewModel.consumeOrderCreated()
         }
+    }
+
+    if (state.isCheckingOut || state.orderCreated) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator(color = CoffeeBlue)
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Placing your order...",
+                    color = CoffeeNavy,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+        return
     }
 
     Scaffold(
@@ -133,9 +156,11 @@ fun CartScreen(
     }
 
     if (showAddressDialog) {
-        CheckoutAddressDialog(
+        DeliveryAddressDialog(
             profileAddress = state.profileAddress,
             isLoading = state.isCheckingOut,
+            confirmLabel = "Place order",
+            loadingLabel = "Placing order...",
             onDismiss = { if (!state.isCheckingOut) showAddressDialog = false },
             onConfirm = {
                 viewModel.checkout(it)
@@ -209,81 +234,6 @@ private fun CartItemRow(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun CheckoutAddressDialog(
-    profileAddress: String,
-    isLoading: Boolean,
-    onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit
-) {
-    var useProfileAddress by remember(profileAddress) { mutableStateOf(profileAddress.isNotBlank()) }
-    var customAddress by remember { mutableStateOf("") }
-    var showMapPicker by remember { mutableStateOf(false) }
-    val address = if (useProfileAddress) profileAddress else customAddress
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Delivery address") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                if (profileAddress.isNotBlank()) {
-                    Row(
-                        Modifier.fillMaxWidth().clickable { useProfileAddress = true },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(selected = useProfileAddress, onClick = { useProfileAddress = true })
-                        Column {
-                            Text("Use profile address", fontWeight = FontWeight.SemiBold)
-                            Text(profileAddress, color = Color.Gray, fontSize = 12.sp)
-                        }
-                    }
-                }
-                Row(
-                    Modifier.fillMaxWidth().clickable { useProfileAddress = false },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(selected = !useProfileAddress, onClick = { useProfileAddress = false })
-                    Text("Enter another address", fontWeight = FontWeight.SemiBold)
-                }
-                if (!useProfileAddress) {
-                    OutlinedTextField(
-                        value = customAddress,
-                        onValueChange = { customAddress = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Delivery address") },
-                        minLines = 2
-                    )
-                    OutlinedButton(
-                        onClick = { showMapPicker = true },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.Outlined.Map, null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Select on map")
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onConfirm(address) }, enabled = address.isNotBlank() && !isLoading) {
-                Text(if (isLoading) "Placing order..." else "Place order")
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss, enabled = !isLoading) { Text("Cancel") } }
-    )
-
-    if (showMapPicker) {
-        MapAddressPickerDialog(
-            initialAddress = customAddress,
-            onDismiss = { showMapPicker = false },
-            onAddressSelected = {
-                customAddress = it
-                useProfileAddress = false
-                showMapPicker = false
-            }
-        )
     }
 }
 

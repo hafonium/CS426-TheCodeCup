@@ -10,6 +10,8 @@ class OrderBase(BaseModel):
 class OrderCreate(OrderBase):
     cart_items: List[int] = []  # List of cart item ids associated with the order
 
+class OrderCreateNoCart(OrderBase):
+    pass
 
 class OrderResponse(OrderBase):
     id: int

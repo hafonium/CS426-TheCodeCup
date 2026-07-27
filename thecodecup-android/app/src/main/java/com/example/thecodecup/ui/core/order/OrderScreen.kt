@@ -29,14 +29,24 @@ fun OrderScreen(
     viewModel: OrderViewModel,
     onHome: () -> Unit,
     onRewards: () -> Unit,
-    onFood: (Int) -> Unit
+    onFood: (Int) -> Unit,
+    onOrderCompleted: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var completedSelected by rememberSaveable { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) { viewModel.refresh() }
+    LaunchedEffect(state.completionMessage) {
+        state.completionMessage?.let { message ->
+            onOrderCompleted()
+            snackbarHostState.showSnackbar(message)
+            viewModel.consumeCompletionMessage()
+        }
+    }
 
     Scaffold(
         containerColor = Color.White,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
                 NavigationBarItem(false, onHome, { Icon(Icons.Outlined.Home, "Home") }, label = { Text("Home") })

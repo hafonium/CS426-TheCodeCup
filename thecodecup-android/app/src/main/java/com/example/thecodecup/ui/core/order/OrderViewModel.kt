@@ -15,7 +15,8 @@ data class OrderUiState(
     val ongoing: List<OrderModel> = emptyList(),
     val completed: List<OrderModel> = emptyList(),
     val errorMessage: String? = null,
-    val completingOrderIds: Set<Int> = emptySet()
+    val completingOrderIds: Set<Int> = emptySet(),
+    val completionMessage: String? = null
 )
 
 class OrderViewModel(
@@ -53,7 +54,8 @@ class OrderViewModel(
                     _uiState.value = _uiState.value.copy(
                         ongoing = _uiState.value.ongoing.filterNot { it.id == order.id },
                         completed = listOf(completedOrder) + _uiState.value.completed.filterNot { it.id == order.id },
-                        completingOrderIds = _uiState.value.completingOrderIds - order.id
+                        completingOrderIds = _uiState.value.completingOrderIds - order.id,
+                        completionMessage = "Order completed"
                     )
                 },
                 onFailure = {
@@ -64,5 +66,9 @@ class OrderViewModel(
                 }
             )
         }
+    }
+
+    fun consumeCompletionMessage() {
+        _uiState.value = _uiState.value.copy(completionMessage = null)
     }
 }

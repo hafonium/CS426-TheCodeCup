@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, selectinload
-from sqlalchemy import select
+from sqlalchemy import func, select
 from app.models.food_model import FoodModel
 from app.models.food_option_model import FoodOptionModel
 from app.schemas.food_schema import FoodCreate, FoodUpdate
@@ -75,3 +75,7 @@ def delete_food_by_id(db: Session, food_id: int) -> FoodModel | None:
 def get_food_options_by_food_id(db: Session, food_id: int) -> list[FoodOptionModel]:
     stmt = select(FoodOptionModel).where(FoodOptionModel.food_id == food_id)
     return db.scalars(stmt).all()
+
+def get_random_food(db: Session) -> FoodModel | None:
+    stmt = select(FoodModel).order_by(func.random()).limit(1)
+    return db.scalars(stmt).first()

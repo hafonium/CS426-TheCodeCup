@@ -3,7 +3,9 @@ from sqlalchemy import select
 from app.models.order_item_model import OrderItemModel
 from app.models.cart_item_food_option_type_model import CartItemFoodOptionTypeModel
 from app.models.cart_item_model import CartItemModel
+from app.schemas.cart_item_schema import CartItemCreateForPromotion
 from app.repositories import cart_item_repository
+from app.repositories import food_repository
 
 def get_order_items_by_order_id(db: Session, order_id: int):
     """
@@ -41,6 +43,39 @@ def create_order_item(db: Session, cart_item_id: int, order_id: int, commit: boo
     
     
     try: 
+        db.add(order_item)
+        if commit:
+            db.commit()
+            db.refresh(order_item)
+        else:
+            db.flush()
+        return order_item
+    except Exception as e:
+        db.rollback()
+        raise e
+
+def create_order_items_for_food_id_for_promotion(
+    db: Session, 
+    cart_item: CartItemCreateForPromotion,
+    commit: bool = True):
+    """
+    Creates order items for all cart items associated with a specific food ID.
+    This is useful for bulk operations where multiple cart items need to be converted into order items.
+    """
+    food = food_repository.get_food_by_id(db, cart_item.food_id)
+    if not food:
+        raise ValueError(f"Food with ID {cart_item.food_id} not found.")
+
+    order_item = OrderItemModel(
+        name=food.name,
+        food_id=food.id,
+        quantity=1,  # Default quantity for this operation
+        price=food.price,
+        order_id=cart_item.order_id,
+        description=cart_item.description
+    )
+
+    try:
         db.add(order_item)
         if commit:
             db.commit()
