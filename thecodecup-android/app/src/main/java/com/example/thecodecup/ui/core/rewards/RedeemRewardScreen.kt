@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.thecodecup.domain.models.RedeemRewardModel
 import com.example.thecodecup.ui.components.DeliveryAddressDialog
+import com.example.thecodecup.ui.components.RewardSuccessDialog
 import com.example.thecodecup.ui.components.buttons.BackButton
 import com.example.thecodecup.ui.theme.CoffeeBlue
 import com.example.thecodecup.ui.theme.CoffeeNavy
@@ -31,12 +32,17 @@ fun RedeemRewardScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var selectedReward by remember { mutableStateOf<RedeemRewardModel?>(null) }
+    var successMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(state.message, state.errorMessage) {
-        val feedback = state.message ?: state.errorMessage
-        if (feedback != null) {
-            if (state.message != null) onRedeemed()
-            snackbarHostState.showSnackbar(feedback)
+        state.message?.let {
+            successMessage = it
+            onRedeemed()
+            viewModel.clearFeedback()
+            return@LaunchedEffect
+        }
+        state.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
             viewModel.clearFeedback()
         }
     }
@@ -98,6 +104,14 @@ fun RedeemRewardScreen(
                 viewModel.redeem(reward, it)
                 selectedReward = null
             }
+        )
+    }
+
+    successMessage?.let { message ->
+        RewardSuccessDialog(
+            title = "Drink redeemed!",
+            message = message,
+            onDismiss = { successMessage = null }
         )
     }
 }

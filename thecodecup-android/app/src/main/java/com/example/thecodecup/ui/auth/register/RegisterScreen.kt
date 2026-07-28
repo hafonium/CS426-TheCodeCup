@@ -14,14 +14,16 @@ fun RegisterScreen(
     viewModel: RegisterViewModel,
     onNavigateToWelcome: () -> Unit,
     onNavigateToLogin: () -> Unit,
+    onNavigateToEmailVerification: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState) {
-        if (uiState is RegisterUiState.Success) {
+        val state = uiState
+        if (state is RegisterUiState.Success) {
             viewModel.resetState()
-            onNavigateToLogin()
+            onNavigateToEmailVerification(state.email)
         }
     }
 

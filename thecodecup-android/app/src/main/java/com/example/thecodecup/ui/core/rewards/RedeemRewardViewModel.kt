@@ -68,7 +68,7 @@ class RedeemRewardViewModel(
                     _uiState.value = _uiState.value.copy(
                         redeemingRewardId = null,
                         totalPoints = promotion.totalRewardPoint,
-                        message = "${reward.food.name} redeemed successfully"
+                        message = "${reward.food.name} redeemed successfully. View it in your order."
                     )
                 },
                 onFailure = {

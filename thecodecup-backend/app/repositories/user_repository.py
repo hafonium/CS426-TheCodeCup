@@ -4,8 +4,9 @@ from app.models.user_model import UserModel
 from app.schemas.user_schema import UserCreate, UserUpdate
 from app.schemas.promotion_schema import PromotionCreate
 from app.core.security import get_password_hash, verify_password
-from app.core.exceptions import EmailAlreadyExistsException, PasswordMismatchException
+from app.core.exceptions import EmailAlreadyExistsException, PasswordMismatchException, EmailVerificationException
 from app.repositories.promotion_repository import create_promotion
+from app.repositories.otp_repository import get_otp_by_email
 
 def get_all_users(db: Session) -> list[UserModel]:
     stmt = select(UserModel)
@@ -20,7 +21,10 @@ def get_user_by_email(db: Session, email: str) -> UserModel | None:
     return db.scalars(stmt).first()
     
 def create_user(db: Session, user: UserCreate):
-    if get_user_by_email(db, user.email):
+    user_response = get_user_by_email(db, user.email)
+    if user_response:
+        if not user_response.is_verified:
+            raise EmailVerificationException()
         raise EmailAlreadyExistsException(email=user.email)
 
     hashed_password = get_password_hash(user.password) 
@@ -83,4 +87,34 @@ def update_user(db: Session, current_user: UserModel, user: UserUpdate):
         db.rollback()
         raise e
         
+def verify(db, email: str):
+    db_user = get_user_by_email(db, email)
+    if not db_user:
+        raise ValueError("User not found")
     
+    db_user.is_verified = True
+
+    try:
+        db.commit()
+        db.refresh(db_user)
+    except Exception as e:
+        db.rollback()
+        raise e
+
+def update_password_forgot(db: Session, email: str, new_password: str):
+    db_user = get_user_by_email(db, email)
+    if not db_user:
+        raise ValueError("User not found")
+
+    otp = get_otp_by_email(db, email)
+    if not otp or otp.is_successful is False:
+        raise ValueError("OTP verification required before updating password")
+
+    db_user.hashed_password = get_password_hash(new_password)
+
+    try:
+        db.commit()
+        db.refresh(db_user)
+    except Exception as e:
+        db.rollback()
+        raise e

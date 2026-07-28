@@ -2,6 +2,7 @@ package com.example.thecodecup.data.remote.dto
 
 import com.example.thecodecup.domain.models.UserResponseModel
 import com.google.gson.annotations.SerializedName
+import java.io.Serial
 
 data class UserCreateDto(
     @SerializedName("email") val email: String,
@@ -44,4 +45,9 @@ data class UserUpdateDto(
     @SerializedName("address") val address: String,
     @SerializedName("old_password") val oldPassword: String? = null,
     @SerializedName("new_password") val newPassword: String? = null
+)
+
+data class UserChangeForgotPasswordDto(
+    @SerializedName("email") val email: String,
+    @SerializedName("new_password") val newPassword: String
 )

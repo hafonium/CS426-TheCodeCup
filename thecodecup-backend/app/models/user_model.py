@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlalchemy import String
+from sqlalchemy import String, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, validates, relationship
 from app.models.base import Base
 from typing import List
@@ -18,6 +18,7 @@ class UserModel(Base):
     
     address: Mapped[str] = mapped_column(String)
     token_version: Mapped[int] = mapped_column(default=0)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
 
     cart_items: Mapped[list["CartItemModel"]] = relationship(
         "CartItemModel",
@@ -38,21 +39,9 @@ class UserModel(Base):
         back_populates="user",  
     )
 
-    @validates("phone_number")
-    def validate_phone_number(self, key: str, value: str) -> str:
-        if not value:
-            raise ValueError("Phone number cannot be empty")
-            
-        try:
-            parsed_number = phonenumbers.parse(value, "VN") 
-            
-            if not phonenumbers.is_valid_number(parsed_number):
-                raise ValueError("Invalid phone number format")
-                
-            return phonenumbers.format_number(
-                parsed_number, 
-                phonenumbers.PhoneNumberFormat.E164
-            )
-            
-        except phonenumbers.NumberParseException:
-            raise ValueError("Could not parse phone number")
+    otp: Mapped["OTPModel"] = relationship(
+        "OTPModel",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )

@@ -1,6 +1,7 @@
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 from typing import Optional
 from app.schemas.cart_item_schema import CartItemResponse
+import phonenumbers
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -9,6 +10,17 @@ class UserBase(BaseModel):
     avatar_image_path: Optional[str] = None
     address: str
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("phone_number")
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        try:
+            parsed = phonenumbers.parse(v, "VN")
+            if not phonenumbers.is_valid_number(parsed):
+                raise ValueError("Invalid phone number format")
+            return phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+        except phonenumbers.NumberParseException:
+            raise ValueError("Could not parse phone number")
 
 class UserCreate(UserBase):
     password: str
@@ -20,7 +32,7 @@ class UserCreate(UserBase):
                 "phone_number": "",
                 "avatar_image_path": None, 
                 "address": "",
-                "password": ""
+                "password": "",
             }
         }
     )
@@ -43,6 +55,29 @@ class UserUpdate(BaseModel):
                 "address": None,
                 "old_password": None,
                 "new_password": None
+            }
+        }
+    )
+
+class UserRequestPasswordForgot(BaseModel):
+    email: EmailStr
+    new_password: str
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "email": "",
+                "new_password": ""
+            }
+        }
+    )
+
+class UserUpdatePasswordOTP(BaseModel):
+    new_password: str
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "new_password": "new_password"
             }
         }
     )

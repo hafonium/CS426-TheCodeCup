@@ -2,9 +2,14 @@ package com.example.thecodecup.ui.components
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -20,6 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.withContext
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
@@ -29,6 +38,7 @@ import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
 import java.util.Locale
+import kotlin.coroutines.resume
 
 @Composable
 fun MapAddressPickerDialog(
@@ -40,29 +50,48 @@ fun MapAddressPickerDialog(
     var selectedPoint by remember { mutableStateOf<GeoPoint?>(null) }
     var selectedAddress by remember(initialAddress) { mutableStateOf(initialAddress) }
     var locating by remember { mutableStateOf(false) }
+    var locationMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    var locationJob by remember { mutableStateOf<Job?>(null) }
 
     fun selectCurrentLocation() {
-        locating = true
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val location = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
-            .mapNotNull { provider ->
-                runCatching {
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED
-                    ) manager.getLastKnownLocation(provider) else null
-                }.getOrNull()
+        if (!manager.isDeviceLocationEnabled()) {
+            locating = false
+            locationMessage = "Phone location is turned off. Turn on Location Services, then try again."
+            return
+        }
+
+        locationJob?.cancel()
+        locating = true
+        locationMessage = null
+        locationJob = scope.launch {
+            val freshLocation = withTimeoutOrNull(12_000L) {
+                manager.awaitLocation()
             }
-            .maxByOrNull { it.time }
-        if (location != null) selectedPoint = GeoPoint(location.latitude, location.longitude)
-        locating = false
+            val location = freshLocation ?: manager.newestLastKnownLocation()
+            if (location != null) {
+                selectedPoint = GeoPoint(location.latitude, location.longitude)
+                if (freshLocation == null) {
+                    locationMessage = "A live fix timed out, so the most recent saved location is shown."
+                }
+            } else {
+                locationMessage =
+                    "Could not get your location. Move to an open area and try again."
+            }
+            locating = false
+        }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { grants ->
-        if (grants.values.any { it }) selectCurrentLocation() else locating = false
+        if (grants.values.any { it }) {
+            selectCurrentLocation()
+        } else {
+            locating = false
+            locationMessage = "Location permission is required to use your current location."
+        }
     }
 
     LaunchedEffect(selectedPoint) {
@@ -130,6 +159,22 @@ fun MapAddressPickerDialog(
                     Spacer(Modifier.width(6.dp))
                     Text(if (locating) "Finding location..." else "Use my location")
                 }
+                locationMessage?.let { message ->
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    if (!managerLocationEnabled(context)) {
+                        TextButton(
+                            onClick = {
+                                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                            }
+                        ) {
+                            Text("Turn on phone location")
+                        }
+                    }
+                }
             }
         },
         confirmButton = {
@@ -140,7 +185,62 @@ fun MapAddressPickerDialog(
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
     )
+
+    DisposableEffect(Unit) {
+        onDispose { locationJob?.cancel() }
+    }
 }
+
+private fun managerLocationEnabled(context: Context): Boolean =
+    (context.getSystemService(Context.LOCATION_SERVICE) as LocationManager)
+        .isDeviceLocationEnabled()
+
+private fun LocationManager.isDeviceLocationEnabled(): Boolean =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        isLocationEnabled
+    } else {
+        runCatching {
+            isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        }.getOrDefault(false)
+    }
+
+@Suppress("MissingPermission")
+private suspend fun LocationManager.awaitLocation(): Location? =
+    suspendCancellableCoroutine { continuation ->
+        val enabledProviders = listOf(
+            LocationManager.GPS_PROVIDER,
+            LocationManager.NETWORK_PROVIDER
+        ).filter { provider -> runCatching { isProviderEnabled(provider) }.getOrDefault(false) }
+
+        if (enabledProviders.isEmpty()) {
+            continuation.resume(null)
+            return@suspendCancellableCoroutine
+        }
+
+        lateinit var listener: LocationListener
+        listener = LocationListener { location ->
+            if (continuation.isActive) {
+                removeUpdates(listener)
+                continuation.resume(location)
+            }
+        }
+        continuation.invokeOnCancellation { removeUpdates(listener) }
+        runCatching {
+            enabledProviders.forEach { provider ->
+                requestLocationUpdates(provider, 0L, 0f, listener)
+            }
+        }.onFailure {
+            removeUpdates(listener)
+            if (continuation.isActive) continuation.resume(null)
+        }
+    }
+
+@Suppress("MissingPermission")
+private fun LocationManager.newestLastKnownLocation(): Location? =
+    listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+        .mapNotNull { provider -> runCatching { getLastKnownLocation(provider) }.getOrNull() }
+        .maxByOrNull { it.time }
 
 @Composable
 private fun AddressMap(

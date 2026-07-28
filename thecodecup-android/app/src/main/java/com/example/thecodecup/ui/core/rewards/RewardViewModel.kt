@@ -28,7 +28,8 @@ data class RewardUiState(
     val isRequestingGacha: Boolean = false,
     val isSpinningGacha: Boolean = false,
     val errorMessage: String? = null,
-    val feedbackMessage: String? = null
+    val feedbackMessage: String? = null,
+    val winMessage: String? = null
 )
 
 class RewardViewModel(
@@ -101,11 +102,15 @@ class RewardViewModel(
         val prize = _uiState.value.gachaPrize ?: return
         _uiState.value = _uiState.value.copy(
             isSpinningGacha = false,
-            feedbackMessage = "You won ${prize.name}!"
+            winMessage = "You won ${prize.name}! View it in your order."
         )
     }
 
     fun clearFeedback() {
         _uiState.value = _uiState.value.copy(feedbackMessage = null)
+    }
+
+    fun clearWinMessage() {
+        _uiState.value = _uiState.value.copy(winMessage = null)
     }
 }
