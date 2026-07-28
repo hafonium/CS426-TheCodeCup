@@ -19,6 +19,10 @@ import com.example.thecodecup.domain.usecases.auth.GetCurrentUserUseCase
 import com.example.thecodecup.domain.usecases.auth.LoginUseCase
 import com.example.thecodecup.domain.usecases.auth.LogoutUseCase
 import com.example.thecodecup.domain.usecases.auth.RegisterUseCase
+import com.example.thecodecup.domain.usecases.auth.ChangeForgotPasswordUseCase
+import com.example.thecodecup.domain.usecases.auth.SendOtpUseCase
+import com.example.thecodecup.domain.usecases.auth.VerifyEmailUseCase
+import com.example.thecodecup.domain.usecases.auth.VerifyForgotPasswordUseCase
 import org.osmdroid.config.Configuration
 
 class App(): Application() {
@@ -45,6 +49,10 @@ class App(): Application() {
     val loginUseCase by lazy { LoginUseCase(authRepository, authPrefs) }
     val logoutUseCase by lazy { LogoutUseCase(authRepository, authPrefs) }
     val registerUseCase by lazy { RegisterUseCase(userRepository) }
+    val sendOtpUseCase by lazy { SendOtpUseCase(userRepository) }
+    val verifyEmailUseCase by lazy { VerifyEmailUseCase(userRepository) }
+    val verifyForgotPasswordUseCase by lazy { VerifyForgotPasswordUseCase(userRepository) }
+    val changeForgotPasswordUseCase by lazy { ChangeForgotPasswordUseCase(userRepository) }
     val getCurrentUserUseCase by lazy { GetCurrentUserUseCase(userRepository) }
     val getFoodsUseCase by lazy { com.example.thecodecup.domain.usecases.home.GetFoodsUseCase(foodRepository) }
     val getFoodDetailsUseCase by lazy { com.example.thecodecup.domain.usecases.details.GetFoodDetailsUseCase(foodRepository) }

@@ -28,6 +28,7 @@ import com.example.thecodecup.domain.models.GainedRewardModel
 import com.example.thecodecup.ui.components.LoyaltyCard
 import com.example.thecodecup.ui.components.DeliveryAddressDialog
 import com.example.thecodecup.ui.components.Gacha
+import com.example.thecodecup.ui.components.RewardSuccessDialog
 import com.example.thecodecup.ui.theme.CoffeeBlue
 import com.example.thecodecup.ui.theme.CoffeeNavy
 
@@ -139,6 +140,14 @@ fun RewardScreen(
                 showAddressDialog = false
                 viewModel.useGachapon(it)
             }
+        )
+    }
+
+    state.winMessage?.let { message ->
+        RewardSuccessDialog(
+            title = "Congratulations!",
+            message = message,
+            onDismiss = viewModel::clearWinMessage
         )
     }
 }

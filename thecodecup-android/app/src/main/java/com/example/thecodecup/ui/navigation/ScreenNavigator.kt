@@ -11,6 +11,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.thecodecup.ui.App
 import com.example.thecodecup.ui.auth.auth.AuthState
 import com.example.thecodecup.ui.auth.auth.AuthViewModel
@@ -21,6 +23,11 @@ import com.example.thecodecup.ui.auth.login.LoginViewModel
 import com.example.thecodecup.ui.auth.register.RegisterScreen
 import com.example.thecodecup.ui.auth.register.RegisterViewModel
 import com.example.thecodecup.ui.auth.welcome.WelcomeScreen
+import com.example.thecodecup.ui.auth.forgot.ChangeForgotPasswordScreen
+import com.example.thecodecup.ui.auth.forgot.ForgotPasswordEmailScreen
+import com.example.thecodecup.ui.auth.forgot.ForgotPasswordViewModel
+import com.example.thecodecup.ui.auth.verification.OtpVerificationScreen
+import com.example.thecodecup.ui.auth.verification.OtpVerificationViewModel
 import com.example.thecodecup.ui.core.profile.ProfileScreen
 import com.example.thecodecup.ui.core.profile.ProfileViewModel
 import com.example.thecodecup.ui.core.splash.SplashScreen
@@ -292,7 +299,7 @@ fun ScreenNavigator(
                 factory = viewModelFactory {
                     initializer {
                         val appInstance = context.applicationContext as App
-                        RegisterViewModel(appInstance.registerUseCase)
+                        RegisterViewModel(appInstance.registerUseCase, appInstance.sendOtpUseCase)
                     }
                 }
             )
@@ -308,6 +315,38 @@ fun ScreenNavigator(
                     navController.navigate(Screen.Welcome.route) {
                         popUpTo(Screen.Register.route) { inclusive = true }
                     }
+                },
+                onNavigateToEmailVerification = {
+                    navController.navigate(Screen.VerifyEmail.createRoute(it))
+                }
+            )
+        }
+
+        composable(
+            route = Screen.VerifyEmail.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email").orEmpty()
+            val verificationViewModel: OtpVerificationViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        OtpVerificationViewModel(
+                            verifyOtp = appInstance.verifyEmailUseCase::invoke,
+                            sendOtpUseCase = appInstance.sendOtpUseCase
+                        )
+                    }
+                }
+            )
+            OtpVerificationScreen(
+                email = email,
+                title = "Verify your email",
+                viewModel = verificationViewModel,
+                onBack = { navController.popBackStack() },
+                onVerified = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Register.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -317,7 +356,7 @@ fun ScreenNavigator(
                 factory = viewModelFactory {
                     initializer {
                         val appInstance = context.applicationContext as App
-                        LoginViewModel(appInstance.loginUseCase)
+                        LoginViewModel(appInstance.loginUseCase, appInstance.sendOtpUseCase)
                     }
                 }
             )
@@ -332,9 +371,95 @@ fun ScreenNavigator(
                 onNavigateToRegister = {
                     navController.navigate(Screen.Register.route)
                 },
+                onNavigateToForgotPassword = {
+                    navController.navigate(Screen.ForgotPassword.createRoute(it))
+                },
+                onNavigateToEmailVerification = {
+                    navController.navigate(Screen.VerifyEmail.createRoute(it))
+                },
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(
+            route = Screen.ForgotPassword.route,
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val initialEmail = backStackEntry.arguments?.getString("email").orEmpty()
+            val forgotViewModel: ForgotPasswordViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        ForgotPasswordViewModel(sendOtpUseCase = appInstance.sendOtpUseCase)
+                    }
+                }
+            )
+            ForgotPasswordEmailScreen(
+                initialEmail = initialEmail,
+                viewModel = forgotViewModel,
+                onBack = { navController.popBackStack() },
+                onCodeSent = {
+                    navController.navigate(Screen.VerifyForgotPassword.createRoute(it))
+                }
+            )
+        }
+
+        composable(
+            route = Screen.VerifyForgotPassword.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email").orEmpty()
+            val verificationViewModel: OtpVerificationViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        OtpVerificationViewModel(
+                            verifyOtp = appInstance.verifyForgotPasswordUseCase::invoke,
+                            sendOtpUseCase = appInstance.sendOtpUseCase
+                        )
+                    }
+                }
+            )
+            OtpVerificationScreen(
+                email = email,
+                title = "Verify reset code",
+                viewModel = verificationViewModel,
+                onBack = { navController.popBackStack() },
+                onVerified = {
+                    navController.navigate(Screen.ChangeForgotPassword.createRoute(email))
+                }
+            )
+        }
+
+        composable(
+            route = Screen.ChangeForgotPassword.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email").orEmpty()
+            val forgotViewModel: ForgotPasswordViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        ForgotPasswordViewModel(
+                            changePasswordUseCase = appInstance.changeForgotPasswordUseCase
+                        )
+                    }
+                }
+            )
+            ChangeForgotPasswordScreen(
+                email = email,
+                viewModel = forgotViewModel,
+                onBack = { navController.popBackStack() },
+                onPasswordChanged = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.ForgotPassword.route) { inclusive = true }
+                        launchSingleTop = true
                     }
                 }
             )

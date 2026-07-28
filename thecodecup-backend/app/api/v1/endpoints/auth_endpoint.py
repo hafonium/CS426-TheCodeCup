@@ -13,6 +13,7 @@ import jwt
 from app.core.security import SECRET_KEY, ALGORITHM
 from app.repositories import revoked_token_repository
 from datetime import datetime, timezone
+from app.core.exceptions import EmailVerificationException
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
@@ -34,6 +35,15 @@ def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
         
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "EMAIL_NOT_VERIFIED",
+                "message": "Email exists but is not verified. Please verify your email before logging in."
+            }
+        )
+            
     # Generate the JWT token
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(

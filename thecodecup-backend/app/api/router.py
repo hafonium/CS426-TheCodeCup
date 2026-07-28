@@ -7,7 +7,8 @@ from app.api.v1.endpoints import (
     cart_endpoint, 
     order_endpoint, 
     promotion_endpoint, 
-    redeem_reward_endpoint
+    redeem_reward_endpoint,
+    otp_endpoint
 )
 
 
@@ -20,3 +21,4 @@ api_router.include_router(cart_endpoint.router)
 api_router.include_router(order_endpoint.router)
 api_router.include_router(promotion_endpoint.router)
 api_router.include_router(redeem_reward_endpoint.router)
+api_router.include_router(otp_endpoint.router)

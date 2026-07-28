@@ -43,6 +43,7 @@ fun LoginScreenContent(
     onLoginClicked: (String, String) -> Unit,
     onNavigateToWelcome: () -> Unit,
     onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val buttonShape = RoundedCornerShape(14.dp)
@@ -128,7 +129,7 @@ fun LoginScreenContent(
             color = CoffeeBlue,
             modifier = Modifier
                 .clickable {
-                    // Handle forgot password logic here
+                    onNavigateToForgotPassword(emailText.trim())
                 }
                 .align(Alignment.End)
         )

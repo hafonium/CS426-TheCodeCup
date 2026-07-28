@@ -15,14 +15,23 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     onNavigateToWelcome : () -> Unit = { },
     onNavigateToRegister : () -> Unit = { },
+    onNavigateToForgotPassword: (String) -> Unit = { },
+    onNavigateToEmailVerification: (String) -> Unit = { },
     onNavigateToHome : () -> Unit = { }
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState) {
-        if (uiState is LoginUiState.Success) {
-            viewModel.resetState()
-            onNavigateToHome()
+        when (val state = uiState) {
+            is LoginUiState.Success -> {
+                viewModel.resetState()
+                onNavigateToHome()
+            }
+            is LoginUiState.EmailVerificationRequired -> {
+                viewModel.resetState()
+                onNavigateToEmailVerification(state.email)
+            }
+            else -> Unit
         }
     }
 
@@ -33,6 +42,7 @@ fun LoginScreen(
         },
         onNavigateToWelcome = onNavigateToWelcome,
         onNavigateToRegister = onNavigateToRegister,
+        onNavigateToForgotPassword = onNavigateToForgotPassword,
         modifier = modifier
     )
 }
@@ -46,6 +56,7 @@ fun LoginScreenPreview_Idle() {
              onLoginClicked = { _, _ -> },
              onNavigateToWelcome = {},
              onNavigateToRegister = {}
+             ,onNavigateToForgotPassword = {}
          )
      }
  }
@@ -59,6 +70,7 @@ fun LoginScreenPreview_Loading() {
             onLoginClicked = { _, _ -> },
             onNavigateToWelcome = {},
             onNavigateToRegister = {}
+            ,onNavigateToForgotPassword = {}
         )
     }
 }
@@ -72,6 +84,7 @@ fun LoginScreenPreview_Error() {
             onLoginClicked = { _, _ -> },
             onNavigateToWelcome = {},
             onNavigateToRegister = {}
+            ,onNavigateToForgotPassword = {}
         )
     }
 }

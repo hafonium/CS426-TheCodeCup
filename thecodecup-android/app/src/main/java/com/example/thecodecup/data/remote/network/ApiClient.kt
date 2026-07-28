@@ -4,6 +4,7 @@ import com.example.thecodecup.BuildConfig
 import com.example.thecodecup.data.remote.api.AuthApiService
 import com.example.thecodecup.data.remote.api.CartApiService
 import com.example.thecodecup.data.remote.api.FoodApiService
+import com.example.thecodecup.data.remote.api.OTPApiService
 import com.example.thecodecup.data.remote.api.OrderApiService
 import com.example.thecodecup.data.remote.api.PromotionApiService
 import com.example.thecodecup.data.remote.api.RedeemRewardApiService
@@ -62,5 +63,9 @@ object ApiClient {
 
     val promotionApiService: PromotionApiService by lazy {
         retrofit.create(PromotionApiService::class.java)
+    }
+
+    val otpApiService: OTPApiService by lazy {
+        retrofit.create(OTPApiService::class.java)
     }
 }
