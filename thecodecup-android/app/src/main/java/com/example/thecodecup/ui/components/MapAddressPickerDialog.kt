@@ -265,7 +265,7 @@ private fun AddressMap(
                     clipChildren = true
                     clipToPadding = true
                     controller.setZoom(13.0)
-                    controller.setCenter(GeoPoint(13.7563, 100.5018))
+                    controller.setCenter(GeoPoint(10.7769, 106.7009))
                     overlays.add(MapEventsOverlay(object : MapEventsReceiver {
                         override fun singleTapConfirmedHelper(point: GeoPoint): Boolean {
                             onPointSelected(point)
