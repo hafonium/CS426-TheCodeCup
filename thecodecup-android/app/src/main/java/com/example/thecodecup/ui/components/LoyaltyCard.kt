@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.thecodecup.ui.theme.CoffeeBlue
+import com.example.thecodecup.ui.theme.CoffeeCard
 
 @Composable
 fun LoyaltyCard(
@@ -41,7 +42,7 @@ fun LoyaltyCard(
         Row(
             Modifier
                 .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(12.dp))
+                .background(CoffeeCard, RoundedCornerShape(12.dp))
                 .padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {

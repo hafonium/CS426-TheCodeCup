@@ -59,7 +59,7 @@ private fun HomeScreenContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = { HomeBottomBar(onRewards, onOrder) },
-        containerColor = Color.White
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 20.dp)) {
             Spacer(Modifier.height(12.dp))
@@ -115,7 +115,7 @@ private fun currentVietnamGreeting(): String {
 
 @Composable
 private fun HomeBottomBar(onRewards: () -> Unit, onOrder: () -> Unit) {
-    NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
+    NavigationBar(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface, tonalElevation = 8.dp) {
         NavigationBarItem(selected = true, onClick = {}, icon = { Icon(Icons.Outlined.Home, "Home") }, label = { Text("Home") })
         NavigationBarItem(selected = false, onClick = onRewards, icon = { Icon(Icons.Outlined.CardGiftcard, "Rewards") }, label = { Text("Rewards") })
         NavigationBarItem(selected = false, onClick = onOrder, icon = { Icon(Icons.AutoMirrored.Outlined.ReceiptLong, "Order") }, label = { Text("Order") })

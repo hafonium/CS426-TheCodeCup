@@ -55,7 +55,7 @@ fun RedeemRewardScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize().statusBarsPadding(),
-        containerColor = Color.White,
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Row(

@@ -1,24 +1,40 @@
 package com.example.thecodecup.ui.theme
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Monogatari night palette.
+val DarkBackground = Color(0xFF121214)
+val DarkSurface = Color(0xFF1E1E22)
+val DarkPrimary = Color(0xFFE60023)
+val DarkSecondary = Color(0xFFFFCC00)
+val DarkTertiary = Color(0xFF6B46C1)
+val DarkTextPrimary = Color(0xFFFFFFFF)
+val DarkTextSecondary = Color(0xFFA0A0AB)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-val LightBrown = Color(0xFF6F4E37)
-val DarkBrown = Color(0xFFD2691E)
-val Gray = Color(0xFFE0E0E0)
-val White = Color(0xFFCCCCCC)
-val Black = Color(0xFF000000)
-val LightGray = Color(0xFFBDBDBD)
-val DarkBlue = Color(0xFF001F3F)
-val SuperDarkBlue = Color(0xFF0F2333)
+// Monogatari golden-sunset palette.
+val LightBackground = Color(0xFFFDF8F2)
+val LightSurface = Color(0xFFFFFFFF)
+val LightPrimary = Color(0xFFD62828)
+val LightSecondary = Color(0xFFFFAA00)
+val LightTertiary = Color(0xFF8A5EA2)
+val LightTextPrimary = Color(0xFF1F1A24)
+val LightTextSecondary = Color(0xFF6E6278)
 
-// Shared coffee-shop palette used by Home and its supporting screens.
-val CoffeeBlue = Color(0xFF324E5D)
-val CoffeeNavy = Color(0xFF17324A)
-val CoffeeCard = Color(0xFFF5F6FA)
+// Compatibility names used by existing composables now resolve semantically,
+// so they remain legible in either color scheme.
+val CoffeeBlue: Color
+    @Composable get() = MaterialTheme.colorScheme.primary
+val CoffeeNavy: Color
+    @Composable get() = MaterialTheme.colorScheme.onBackground
+val CoffeeCard: Color
+    @Composable get() = MaterialTheme.colorScheme.surface
+val LightBrown: Color
+    @Composable get() = MaterialTheme.colorScheme.primary
+val DarkBrown: Color
+    @Composable get() = MaterialTheme.colorScheme.tertiary
+val Gray: Color
+    @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
+val White: Color
+    @Composable get() = MaterialTheme.colorScheme.onPrimary

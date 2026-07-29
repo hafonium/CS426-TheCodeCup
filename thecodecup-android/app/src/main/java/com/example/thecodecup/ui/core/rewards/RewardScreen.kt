@@ -53,10 +53,10 @@ fun RewardScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = Color.White,
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
+            NavigationBar(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface, tonalElevation = 8.dp) {
                 NavigationBarItem(false, onHome, { Icon(Icons.Outlined.Home, "Home") }, label = { Text("Home") })
                 NavigationBarItem(true, {}, { Icon(Icons.Outlined.CardGiftcard, "Rewards") }, label = { Text("Rewards") })
                 NavigationBarItem(false, onOrder, { Icon(Icons.AutoMirrored.Outlined.ReceiptLong, "Order") }, label = { Text("Order") })
