@@ -42,11 +42,22 @@ fun CartScreen(
     var showAddressDialog by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) { viewModel.refresh() }
-
     LaunchedEffect(state.errorMessage, state.message) {
-        (state.errorMessage ?: state.message)?.let {
-            snackbar.showSnackbar(it)
+        (state.errorMessage ?: state.message)?.let { message ->
+            try {
+                snackbar.showSnackbar(
+                    message = message,
+                    duration = SnackbarDuration.Short
+                )
+            } finally {
+                // Also runs when navigation cancels this screen's effect.
+                viewModel.clearMessage()
+            }
+        }
+    }
+    DisposableEffect(snackbar) {
+        onDispose {
+            snackbar.currentSnackbarData?.dismiss()
             viewModel.clearMessage()
         }
     }

@@ -16,7 +16,8 @@ import retrofit2.HttpException
 class CartRepositoryImpl(private val authPreferences: AuthPreferences) : CartRepository {
     private val api = ApiClient.cartApiService
 
-    override suspend fun getCartItems() = call { api.getCartItems(token()).map(::toDomain) }
+    override suspend fun getCartItems() =
+        call { api.getCartItems(token()).map(::toDomain) }
 
     override suspend fun addCartItem(foodId: Int, quantity: Int, optionTypeIds: List<Int>) =
         call {

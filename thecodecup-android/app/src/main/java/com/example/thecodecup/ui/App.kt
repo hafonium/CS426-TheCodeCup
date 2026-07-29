@@ -9,6 +9,7 @@ import com.example.thecodecup.data.repositories.FoodRepositoryImpl
 import com.example.thecodecup.data.repositories.CartRepositoryImpl
 import com.example.thecodecup.data.repositories.OrderRepositoryImpl
 import com.example.thecodecup.data.repositories.PromotionRepositoryImpl
+import com.example.thecodecup.data.remote.network.ApiClient
 import com.example.thecodecup.domain.repositories.AuthRepository
 import com.example.thecodecup.domain.repositories.UserRepository
 import com.example.thecodecup.domain.repositories.FoodRepository
@@ -24,10 +25,23 @@ import com.example.thecodecup.domain.usecases.auth.SendOtpUseCase
 import com.example.thecodecup.domain.usecases.auth.VerifyEmailUseCase
 import com.example.thecodecup.domain.usecases.auth.VerifyForgotPasswordUseCase
 import org.osmdroid.config.Configuration
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 class App(): Application() {
+    private val _sessionExpiredEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val sessionExpiredEvents = _sessionExpiredEvents.asSharedFlow()
+
     override fun onCreate() {
         super.onCreate()
+        ApiClient.setUnauthorizedHandler {
+            synchronized(authPrefs) {
+                if (authPrefs.getAuthToken() != null) {
+                    authPrefs.clearAuthToken()
+                    _sessionExpiredEvents.tryEmit(Unit)
+                }
+            }
+        }
         Configuration.getInstance().apply {
             load(applicationContext, getSharedPreferences("openstreetmap", MODE_PRIVATE))
             userAgentValue =

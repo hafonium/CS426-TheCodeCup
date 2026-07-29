@@ -56,7 +56,11 @@ fun Gacha(
             Modifier
                 .background(
                     Brush.horizontalGradient(
-                        listOf(Color(0xFFFFF3D8), Color(0xFFEAF3F6))
+                        listOf(
+                            MaterialTheme.colorScheme.secondaryContainer,
+                            MaterialTheme.colorScheme.primaryContainer,
+                            MaterialTheme.colorScheme.tertiaryContainer
+                        )
                     )
                 )
                 .padding(18.dp),
@@ -69,7 +73,7 @@ fun Gacha(
                     Text("Gacha", color = CoffeeNavy, fontWeight = FontWeight.Bold, fontSize = 17.sp)
                     Text(
                         "$gachaponCount ${if (gachaponCount == 1) "spin" else "spins"} available",
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp
                     )
                 }
@@ -128,7 +132,7 @@ fun Gacha(
                 if (isRequesting) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         strokeWidth = 2.dp
                     )
                     Spacer(Modifier.width(8.dp))

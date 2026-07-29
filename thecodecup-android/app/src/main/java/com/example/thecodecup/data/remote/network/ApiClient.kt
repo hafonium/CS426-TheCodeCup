@@ -16,6 +16,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 object ApiClient {
     private val API_URL = BuildConfig.API_URL
+    @Volatile
+    private var unauthorizedHandler: (() -> Unit)? = null
+
+    fun setUnauthorizedHandler(handler: () -> Unit) {
+        unauthorizedHandler = handler
+    }
 
     // Create a logger so we can see exactly what is being sent/received in Logcat
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -24,6 +30,14 @@ object ApiClient {
 
     // Build the OkHttp Client
     private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request()
+            val response = chain.proceed(request)
+            if (response.code == 401 && request.header("Authorization") != null) {
+                unauthorizedHandler?.invoke()
+            }
+            response
+        }
         .addInterceptor(loggingInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS) 
         .readTimeout(30, TimeUnit.SECONDS)

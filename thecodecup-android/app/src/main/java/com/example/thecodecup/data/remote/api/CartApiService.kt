@@ -10,11 +10,12 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Query
 
 interface CartApiService {
     @GET("cart")
     suspend fun getCartItems(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
     ): List<CartItemResponseDto>
 
     @POST("cart/items")
