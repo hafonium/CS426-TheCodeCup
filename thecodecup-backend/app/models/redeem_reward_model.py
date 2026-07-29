@@ -11,6 +11,8 @@ class RedeemRewardModel(Base):
     food_id: Mapped[int] = mapped_column(ForeignKey("FOODS.id"), nullable=False)
     expiration_time: Mapped[datetime] = mapped_column(
         DateTime(timezone=False), # Naive timestamp
+        index=True,
+        nullable=False
     )
     required_point: Mapped[int] = mapped_column(nullable=False)
 

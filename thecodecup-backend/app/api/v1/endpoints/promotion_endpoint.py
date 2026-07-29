@@ -24,12 +24,14 @@ def get_user_promotion(
 
 @router.get("/gained-rewards", response_model=list[GainedRewardResponse], status_code=status.HTTP_200_OK)
 def list_gained_rewards(
-    current_user: UserModel = Depends(get_current_user), 
+    current_user: UserModel = Depends(get_current_user),
+    offset: int = 0,
+    limit: int | None = None, 
     db: Session = Depends(get_db)
 ) -> list[GainedRewardResponse]:
     from app.repositories.gained_reward_repository import get_all_gained_rewards
 
-    gained_rewards = get_all_gained_rewards(db, current_user.id)
+    gained_rewards = get_all_gained_rewards(db, current_user.id, limit=limit, offset=offset)
     return gained_rewards
 
 @router.post("/reward-point", response_model=PromotionResponse, status_code=status.HTTP_200_OK)

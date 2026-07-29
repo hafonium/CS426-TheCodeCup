@@ -7,8 +7,8 @@ import com.example.thecodecup.domain.models.RedeemRewardModel
 
 interface PromotionRepository {
     suspend fun getPromotion(): Result<PromotionModel>
-    suspend fun getGainedRewards(): Result<List<GainedRewardModel>>
-    suspend fun getRedeemRewards(): Result<List<RedeemRewardModel>>
+    suspend fun getGainedRewards(limit: Int = 8, offset: Int = 0): Result<List<GainedRewardModel>>
+    suspend fun getRedeemRewards(limit: Int = 8, offset: Int = 0): Result<List<RedeemRewardModel>>
     suspend fun redeemReward(rewardId: Int, address: String): Result<PromotionModel>
     suspend fun useGachapon(address: String): Result<GachaResultModel>
 }

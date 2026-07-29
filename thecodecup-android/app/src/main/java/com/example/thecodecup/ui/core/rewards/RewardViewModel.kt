@@ -21,6 +21,8 @@ data class RewardUiState(
     val totalPoints: Int = 0,
     val gachaponCount: Int = 0,
     val history: List<GainedRewardModel> = emptyList(),
+    val isLoadingMoreHistory: Boolean = false,
+    val hasMoreHistory: Boolean = false,
     val foods: List<FoodModel> = emptyList(),
     val profileAddress: String = "",
     val gachaPrize: FoodModel? = null,
@@ -39,6 +41,11 @@ class RewardViewModel(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val useGachaponUseCase: UseGachaponUseCase
 ) : ViewModel() {
+    private companion object {
+        const val HISTORY_PAGE_SIZE = 8
+        const val HISTORY_FETCH_SIZE = HISTORY_PAGE_SIZE + 1
+    }
+
     private val _uiState = MutableStateFlow(RewardUiState())
     val uiState: StateFlow<RewardUiState> = _uiState.asStateFlow()
 
@@ -48,7 +55,9 @@ class RewardViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             val promotionRequest = async { getPromotionUseCase() }
-            val historyRequest = async { getGainedRewardsUseCase() }
+            val historyRequest = async {
+                getGainedRewardsUseCase(limit = HISTORY_FETCH_SIZE, offset = 0)
+            }
             val foodsRequest = async { getFoodsUseCase() }
             val userRequest = async { getCurrentUserUseCase() }
             val promotion = promotionRequest.await()
@@ -60,11 +69,43 @@ class RewardViewModel(
                 loyaltyCount = promotion.getOrNull()?.loyaltyCount ?: 0,
                 totalPoints = promotion.getOrNull()?.totalRewardPoint ?: 0,
                 gachaponCount = promotion.getOrNull()?.gachaponCount ?: 0,
-                history = history.getOrDefault(emptyList()),
+                history = history.getOrDefault(emptyList()).take(HISTORY_PAGE_SIZE),
+                hasMoreHistory = history.getOrDefault(emptyList()).size > HISTORY_PAGE_SIZE,
                 foods = foods.getOrDefault(emptyList()),
                 profileAddress = user.getOrNull()?.address.orEmpty(),
                 errorMessage = promotion.exceptionOrNull()?.message
                     ?: history.exceptionOrNull()?.message
+            )
+        }
+    }
+
+    fun loadMoreHistory() {
+        val state = _uiState.value
+        if (state.isLoadingMoreHistory || !state.hasMoreHistory) return
+
+        viewModelScope.launch {
+            _uiState.value = state.copy(
+                isLoadingMoreHistory = true,
+                feedbackMessage = null
+            )
+            getGainedRewardsUseCase(
+                limit = HISTORY_FETCH_SIZE,
+                offset = state.history.size
+            ).fold(
+                onSuccess = { newRewards ->
+                    _uiState.value = _uiState.value.copy(
+                        history = (_uiState.value.history + newRewards.take(HISTORY_PAGE_SIZE))
+                            .distinctBy { it.id },
+                        isLoadingMoreHistory = false,
+                        hasMoreHistory = newRewards.size > HISTORY_PAGE_SIZE
+                    )
+                },
+                onFailure = {
+                    _uiState.value = _uiState.value.copy(
+                        isLoadingMoreHistory = false,
+                        feedbackMessage = it.message ?: "Unable to load more reward history"
+                    )
+                }
             )
         }
     }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,8 +32,13 @@ fun RedeemRewardScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val listState = rememberLazyListState()
     var selectedReward by remember { mutableStateOf<RedeemRewardModel?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(state.currentPage) {
+        listState.scrollToItem(0)
+    }
 
     LaunchedEffect(state.message, state.errorMessage) {
         state.message?.let {
@@ -76,7 +82,8 @@ fun RedeemRewardScreen(
                 TextButton(onClick = viewModel::refresh) { Text("Refresh") }
             }
             else -> LazyColumn(
-                Modifier.fillMaxSize().padding(padding),
+                state = listState,
+                modifier = Modifier.fillMaxSize().padding(padding),
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(18.dp)
             ) {
@@ -87,6 +94,16 @@ fun RedeemRewardScreen(
                         isLoading = state.redeemingRewardId == reward.id,
                         onFood = onFood,
                         onRedeem = { selectedReward = reward }
+                    )
+                }
+                item {
+                    PaginationControls(
+                        currentPage = state.currentPage,
+                        hasPreviousPage = state.currentPage > 1,
+                        hasNextPage = state.hasNextPage,
+                        isLoading = state.isPageLoading,
+                        onPrevious = viewModel::previousPage,
+                        onNext = viewModel::nextPage
                     )
                 }
             }
@@ -113,6 +130,51 @@ fun RedeemRewardScreen(
             message = message,
             onDismiss = { successMessage = null }
         )
+    }
+}
+
+@Composable
+private fun PaginationControls(
+    currentPage: Int,
+    hasPreviousPage: Boolean,
+    hasNextPage: Boolean,
+    isLoading: Boolean,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedButton(
+            onClick = onPrevious,
+            enabled = hasPreviousPage && !isLoading
+        ) {
+            Text("Previous")
+        }
+
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                color = CoffeeBlue,
+                strokeWidth = 2.dp
+            )
+        } else {
+            Text(
+                text = "Page $currentPage",
+                color = CoffeeNavy,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        Button(
+            onClick = onNext,
+            enabled = hasNextPage && !isLoading,
+            colors = ButtonDefaults.buttonColors(containerColor = CoffeeBlue)
+        ) {
+            Text("Next")
+        }
     }
 }
 

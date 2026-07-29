@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -153,9 +154,19 @@ private fun DetailContent(food: FoodModel, onAddToCart: (Int, Int, List<Int>) ->
         }
         food.options.forEach { option ->
             HorizontalDivider(Modifier.padding(vertical = 16.dp), color = CoffeeCard)
-            Text(option.name, color = CoffeeNavy, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = option.name,
+                modifier = Modifier.fillMaxWidth(),
+                color = CoffeeNavy,
+                fontWeight = FontWeight.SemiBold,
+                softWrap = true
+            )
             Spacer(Modifier.height(10.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 option.types.forEach { type ->
                     OptionChip(
                         type = type,
@@ -209,7 +220,11 @@ private fun OptionChip(type: FoodOptionTypeModel, selected: Boolean, onClick: ()
             text = if (type.price == 0.0) type.name else "${type.name}  +$${"%.2f".format(type.price)}",
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
             color = if (selected) Color.White else CoffeeNavy,
-            fontSize = 12.sp
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            softWrap = true,
+            maxLines = Int.MAX_VALUE,
+            overflow = TextOverflow.Clip
         )
     }
 }

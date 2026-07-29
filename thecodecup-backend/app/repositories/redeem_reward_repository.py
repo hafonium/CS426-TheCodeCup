@@ -1,25 +1,36 @@
 from typing import List, Optional
 from sqlalchemy import select
-from sqlalchemy.orm import Session, joinedload, selectinload
+from sqlalchemy.orm import Session, selectinload
 
 from app.models.redeem_reward_model import RedeemRewardModel
 from app.schemas.redeem_reward_schema import RedeemRewardCreate, RedeemRewardResponse
 
 from app.utils.get_vn_time import get_vn_now
 
-def get_all_redeem_rewards(db: Session) -> List[RedeemRewardModel]:
+def get_all_redeem_rewards(
+    db: Session,
+    limit: Optional[int] = None,
+    offset: int = 0,
+) -> List[RedeemRewardModel]:
+    today = get_vn_now()  # Ensure the current time is fetched for comparison
     stmt = (
         select(RedeemRewardModel)
-        .where(RedeemRewardModel.expiration_time > get_vn_now())
+        .where(RedeemRewardModel.expiration_time > today)
         .options(selectinload(RedeemRewardModel.food))
-        .order_by(RedeemRewardModel.expiration_time.asc())
+        .order_by(RedeemRewardModel.required_point.asc())
     )
-    return list(db.scalars(stmt).unique().all())
+    if offset:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    return list(db.scalars(stmt).all())
 
 def get_redeem_reward_by_id(db: Session, redeem_reward_id: int) -> Optional[RedeemRewardModel]:
+    today = get_vn_now()
     stmt = (
         select(RedeemRewardModel)
         .where(RedeemRewardModel.id == redeem_reward_id)
+        .where(RedeemRewardModel.expiration_time > today)
         .options(selectinload(RedeemRewardModel.food))
     )
     return db.scalars(stmt).first()

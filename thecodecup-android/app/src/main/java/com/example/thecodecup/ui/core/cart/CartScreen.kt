@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -255,7 +257,10 @@ private fun EditCartItemDialog(
         onDismissRequest = onDismiss,
         title = { Text("Edit ${item.food.name}") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Quantity", Modifier.weight(1f))
                     IconButton(onClick = { if (quantity > 1) quantity-- }) { Icon(Icons.Outlined.Remove, "Decrease") }
@@ -263,13 +268,29 @@ private fun EditCartItemDialog(
                     IconButton(onClick = { quantity++ }) { Icon(Icons.Outlined.Add, "Increase") }
                 }
                 item.food.options.forEach { option ->
-                    Text(option.name, color = CoffeeNavy, fontWeight = FontWeight.SemiBold)
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        text = option.name,
+                        modifier = Modifier.fillMaxWidth(),
+                        color = CoffeeNavy,
+                        fontWeight = FontWeight.SemiBold,
+                        softWrap = true
+                    )
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
                         option.types.forEach { type ->
                             FilterChip(
                                 selected = selections[option.id]?.id == type.id,
                                 onClick = { selections = selections + (option.id to type) },
-                                label = { Text(type.name) }
+                                label = {
+                                    Text(
+                                        text = type.name,
+                                        softWrap = true,
+                                        maxLines = Int.MAX_VALUE
+                                    )
+                                }
                             )
                         }
                     }

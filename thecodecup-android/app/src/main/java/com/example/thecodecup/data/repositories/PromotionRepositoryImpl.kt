@@ -28,14 +28,18 @@ class PromotionRepositoryImpl(
         }
     }
 
-    override suspend fun getGainedRewards() = call {
-        promotionApi.getGainedRewards(token()).map {
+    override suspend fun getGainedRewards(limit: Int, offset: Int) = call {
+        promotionApi.getGainedRewards(
+            token = token(),
+            limit = limit,
+            offset = offset
+        ).map {
             GainedRewardModel(it.id, it.food.toDomain(), it.gainedPoint, it.createdAt)
         }
     }
 
-    override suspend fun getRedeemRewards() = call {
-        redeemApi.getRedeemRewards().map {
+    override suspend fun getRedeemRewards(limit: Int, offset: Int) = call {
+        redeemApi.getRedeemRewards(limit = limit, offset = offset).map {
             RedeemRewardModel(it.id, it.food.toDomain(), it.expirationTime, it.requiredPoint)
         }
     }
