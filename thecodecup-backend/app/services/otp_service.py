@@ -1,14 +1,10 @@
-import secrets
-from datetime import datetime, timedelta, timezone
-from sqlalchemy.orm import Session
-
+import socket
 import smtplib
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from email.utils import formataddr
 
 from app.core.config import settings
-from app.repositories import otp_repository
 
 def send_otp_email(otp_code: str, email: str) -> bool:
     message = MIMEMultipart("alternative")
@@ -17,10 +13,7 @@ def send_otp_email(otp_code: str, email: str) -> bool:
     message["From"] = formataddr((sender_name, settings.SENDER_EMAIL))
     message["To"] = email
 
-    # Plain text version
     text = f"Your verification code is: {otp_code}. It will expire shortly."
-    
-    # HTML version 
     html = f"""
     <html>
       <body>
@@ -36,10 +29,12 @@ def send_otp_email(otp_code: str, email: str) -> bool:
     message.attach(MIMEText(html, "html"))
 
     try:
-        with smtplib.SMTP(
-            settings.SMTP_SERVER, settings.SMTP_PORT, timeout=10
-        ) as server:
-            server.starttls()  # Secure connection
+        # Resolve hostname explicitly to IPv4 to prevent IPv6 [Errno 101] in Docker
+        ip_address = socket.gethostbyname(settings.SMTP_SERVER)
+
+        with smtplib.SMTP(ip_address, settings.SMTP_PORT, timeout=10) as server:
+            # Pass original hostname for TLS SNI validation
+            server.starttls()
             server.login(settings.SENDER_EMAIL, settings.SENDER_PASSWORD)
             server.sendmail(settings.SENDER_EMAIL, email, message.as_string())
         return True
