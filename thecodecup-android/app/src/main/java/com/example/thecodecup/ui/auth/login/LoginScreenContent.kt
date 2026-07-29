@@ -73,7 +73,7 @@ fun LoginScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
             .systemBarsPadding()
             .padding(horizontal = 20.dp, vertical = 16.dp),
     ) {

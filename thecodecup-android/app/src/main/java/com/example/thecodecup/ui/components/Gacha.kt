@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.thecodecup.domain.models.FoodModel
 import com.example.thecodecup.ui.theme.CoffeeBlue
+import com.example.thecodecup.ui.theme.CoffeeCard
 import com.example.thecodecup.ui.theme.CoffeeNavy
 import kotlinx.coroutines.delay
 
@@ -79,7 +80,7 @@ fun Gacha(
                 Modifier
                     .fillMaxWidth()
                     .height(124.dp)
-                    .background(Color.White.copy(alpha = .75f), RoundedCornerShape(14.dp)),
+                    .background(CoffeeCard, RoundedCornerShape(14.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 val food = displayedFood ?: prize

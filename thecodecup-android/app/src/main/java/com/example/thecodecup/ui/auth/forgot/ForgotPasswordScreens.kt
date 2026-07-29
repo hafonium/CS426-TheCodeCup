@@ -119,7 +119,7 @@ private fun RecoveryForm(
         if (state is ForgotPasswordUiState.Success) onSuccess()
     }
     Column(
-        Modifier.fillMaxSize().background(Color.White).systemBarsPadding()
+        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).systemBarsPadding()
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         BackButton(onClick = onBack, modifier = Modifier.size(44.dp))

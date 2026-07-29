@@ -46,10 +46,10 @@ fun OrderScreen(
     }
 
     Scaffold(
-        containerColor = Color.White,
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
+            NavigationBar(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface, tonalElevation = 8.dp) {
                 NavigationBarItem(false, onHome, { Icon(Icons.Outlined.Home, "Home") }, label = { Text("Home") })
                 NavigationBarItem(false, onRewards, { Icon(Icons.Outlined.CardGiftcard, "Rewards") }, label = { Text("Rewards") })
                 NavigationBarItem(true, {}, { Icon(Icons.AutoMirrored.Outlined.ReceiptLong, "Orders") }, label = { Text("Orders") })
@@ -58,7 +58,7 @@ fun OrderScreen(
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 20.dp)) {
             Text("My Orders", color = CoffeeNavy, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 8.dp))
-            TabRow(selectedTabIndex = if (completedSelected) 1 else 0, containerColor = Color.White, contentColor = CoffeeBlue) {
+            TabRow(selectedTabIndex = if (completedSelected) 1 else 0, containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface, contentColor = CoffeeBlue) {
                 Tab(!completedSelected, { completedSelected = false }, text = { Text("Ongoing") })
                 Tab(completedSelected, { completedSelected = true }, text = { Text("Completed") })
             }

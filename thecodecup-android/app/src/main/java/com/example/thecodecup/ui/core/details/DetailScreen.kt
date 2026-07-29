@@ -53,7 +53,7 @@ fun DetailScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize().statusBarsPadding(),
-        containerColor = Color.White,
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Row(

@@ -3,6 +3,7 @@ package com.example.thecodecup.ui.core.profile
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +13,15 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,6 +34,7 @@ import com.example.thecodecup.ui.components.buttons.Button
 import androidx.compose.ui.graphics.Color
 import com.example.thecodecup.ui.theme.CoffeeBlue
 import com.example.thecodecup.ui.theme.CoffeeNavy
+import com.example.thecodecup.ui.theme.LocalThemeController
 
 @Composable
 fun ProfileScreenContent(
@@ -40,6 +46,7 @@ fun ProfileScreenContent(
     onNavigateToHome: () -> Unit = { }
 ) {
     val buttonShape = RoundedCornerShape(14.dp)
+    val themeController = LocalThemeController.current
 
     // Initial Loading State
     if (uiState is ProfileUiState.Loading) {
@@ -63,7 +70,7 @@ fun ProfileScreenContent(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .systemBarsPadding()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
@@ -144,6 +151,44 @@ fun ProfileScreenContent(
                     )
                 }
             )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = if (themeController.isDarkMode) {
+                        Icons.Outlined.DarkMode
+                    } else {
+                        Icons.Outlined.LightMode
+                    },
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = "Dark mode",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = if (themeController.isDarkMode) "On" else "Off",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Switch(
+                    checked = themeController.isDarkMode,
+                    onCheckedChange = themeController.setDarkMode
+                )
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 

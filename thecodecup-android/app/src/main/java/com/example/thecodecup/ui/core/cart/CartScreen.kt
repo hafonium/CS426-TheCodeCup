@@ -61,7 +61,7 @@ fun CartScreen(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                 .statusBarsPadding()
                 .navigationBarsPadding(),
             contentAlignment = Alignment.Center
@@ -81,7 +81,7 @@ fun CartScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize().statusBarsPadding(),
-        containerColor = Color.White,
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbar) },
         topBar = {
             Row(
@@ -96,7 +96,7 @@ fun CartScreen(
         bottomBar = {
             if (state.items.isNotEmpty()) {
                 Row(
-                    Modifier.fillMaxWidth().background(Color.White).navigationBarsPadding().padding(20.dp),
+                    Modifier.fillMaxWidth().background(androidx.compose.material3.MaterialTheme.colorScheme.surface).navigationBarsPadding().padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(Modifier.weight(1f)) {
