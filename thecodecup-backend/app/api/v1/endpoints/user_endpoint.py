@@ -31,8 +31,6 @@ def get_user(user_id: int, db: Session = Depends(get_db)) -> UserResponse:
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
         user = user_repository.create_user(db, user)
-        new_otp = create_otp(db, email=user.email)  # Create an OTP for the new user
-        send_otp_email(new_otp.otp_code, user.email)  # Send the OTP email
     except EmailAlreadyExistsException as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except EmailVerificationException as e:
