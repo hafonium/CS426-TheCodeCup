@@ -37,9 +37,30 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+    private val deletingItemIds = mutableSetOf<Int>()
+
+    init {
+        refresh()
+    }
 
     fun refresh() {
-        launchAction(showLoading = true) { getCartItems() }
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                errorMessage = null
+            )
+            getCartItems().fold(
+                onSuccess = { items ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        items = items,
+                        selectedItemIds = items.map { it.id }.toSet(),
+                        errorMessage = null
+                    )
+                },
+                onFailure = { showError(it, loading = false) }
+            )
+        }
         viewModelScope.launch {
             getCurrentUser().onSuccess { user ->
                 _uiState.value = _uiState.value.copy(profileAddress = user.address)
@@ -96,6 +117,7 @@ class CartViewModel(
                         message = "Added to cart",
                         errorMessage = null
                     )
+                    refresh()
                 },
                 onFailure = { showError(it) }
             )
@@ -112,17 +134,40 @@ class CartViewModel(
     }
 
     fun delete(itemId: Int) {
+        if (!deletingItemIds.add(itemId)) return
+
         viewModelScope.launch {
-            deleteCartItem(itemId).fold(
-                onSuccess = { updatedItems ->
-                    _uiState.value = _uiState.value.copy(
-                        items = updatedItems,
-                        errorMessage = null
-                    )
-                },
-                onFailure = { showError(it) }
-            )
+            try {
+                deleteCartItem(itemId).fold(
+                    onSuccess = { updatedItems ->
+                        val availableIds = updatedItems.mapTo(mutableSetOf()) { it.id }
+                        _uiState.value = _uiState.value.copy(
+                            items = updatedItems,
+                            selectedItemIds = _uiState.value.selectedItemIds
+                                .filterTo(mutableSetOf()) { it in availableIds },
+                            errorMessage = null
+                        )
+                    },
+                    onFailure = { error ->
+                        if (error.message?.contains("not found", ignoreCase = true) == true) {
+                            removeItemLocally(itemId)
+                        } else {
+                            showError(error)
+                        }
+                    }
+                )
+            } finally {
+                deletingItemIds.remove(itemId)
+            }
         }
+    }
+
+    private fun removeItemLocally(itemId: Int) {
+        _uiState.value = _uiState.value.copy(
+            items = _uiState.value.items.filterNot { it.id == itemId },
+            selectedItemIds = _uiState.value.selectedItemIds - itemId,
+            errorMessage = null
+        )
     }
 
     fun clear() {
@@ -141,23 +186,6 @@ class CartViewModel(
 
     fun clearMessage() {
         _uiState.value = _uiState.value.copy(message = null, errorMessage = null)
-    }
-
-    private fun launchAction(showLoading: Boolean, action: suspend () -> Result<List<CartItemModel>>) {
-        viewModelScope.launch {
-            if (showLoading) _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-            action().fold(
-                onSuccess = {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        items = it,
-                        selectedItemIds = it.map { item -> item.id }.toSet(),
-                        errorMessage = null
-                    )
-                },
-                onFailure = { showError(it, loading = false) }
-            )
-        }
     }
 
     private fun launchItemUpdate(itemId: Int, action: suspend () -> Result<CartItemModel>) {

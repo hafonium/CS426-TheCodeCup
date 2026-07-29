@@ -84,5 +84,4 @@ class UserUpdatePasswordOTP(BaseModel):
 
 class UserResponse(UserBase):
     id: int
-    cart_items: list[CartItemResponse] = []
     model_config = ConfigDict(from_attributes=True)

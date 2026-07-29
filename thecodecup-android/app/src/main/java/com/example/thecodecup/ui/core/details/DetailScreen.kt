@@ -45,8 +45,21 @@ fun DetailScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(cartState.message, cartState.errorMessage) {
-        (cartState.message ?: cartState.errorMessage)?.let {
-            snackbarHostState.showSnackbar(it)
+        (cartState.message ?: cartState.errorMessage)?.let { message ->
+            try {
+                snackbarHostState.showSnackbar(
+                    message = message,
+                    duration = SnackbarDuration.Short
+                )
+            } finally {
+                // Also runs when navigation cancels this screen's effect.
+                cartViewModel.clearMessage()
+            }
+        }
+    }
+    DisposableEffect(snackbarHostState) {
+        onDispose {
+            snackbarHostState.currentSnackbarData?.dismiss()
             cartViewModel.clearMessage()
         }
     }

@@ -3,6 +3,14 @@ package com.example.thecodecup.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,6 +59,7 @@ fun ScreenNavigator(
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val appInstance = context.applicationContext as App
+    val sessionSnackbarHostState = remember { SnackbarHostState() }
     val cartViewModel: CartViewModel = viewModel(
         factory = viewModelFactory {
             initializer {
@@ -86,10 +95,24 @@ fun ScreenNavigator(
         }
     }
 
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Splash.route
-    ) {
+    LaunchedEffect(appInstance) {
+        appInstance.sessionExpiredEvents.collect {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(navController.graph.id) { inclusive = true }
+                launchSingleTop = true
+            }
+            sessionSnackbarHostState.showSnackbar(
+                message = "Your session has expired. Please log in again",
+                duration = SnackbarDuration.Long
+            )
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Splash.route
+        ) {
         composable(route = Screen.Splash.route) {
             SplashScreen()
         }
@@ -500,6 +523,11 @@ fun ScreenNavigator(
                 }
             )
         }
+        }
+        SnackbarHost(
+            hostState = sessionSnackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 
