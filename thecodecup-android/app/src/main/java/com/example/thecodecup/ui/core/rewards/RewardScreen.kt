@@ -122,6 +122,26 @@ fun RewardScreen(
                         RewardHistoryRow(reward, onFood)
                         HorizontalDivider(color = Color(0xFFF1F1F1))
                     }
+                    if (state.hasMoreHistory || state.isLoadingMoreHistory) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (state.isLoadingMoreHistory) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp),
+                                        color = CoffeeBlue,
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    OutlinedButton(onClick = viewModel::loadMoreHistory) {
+                                        Text("Load more")
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

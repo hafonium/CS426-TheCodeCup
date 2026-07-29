@@ -11,9 +11,11 @@ router = APIRouter(prefix="/redeem-rewards", tags=["Redeem Rewards"])
 
 @router.get("", response_model=list[RedeemRewardResponse], status_code=status.HTTP_200_OK)
 def get_redeem_rewards(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    limit: int | None = None,
+    offset: int = 0,
 ):
-    return redeem_reward_repository.get_all_redeem_rewards(db)
+    return redeem_reward_repository.get_all_redeem_rewards(db, limit=limit, offset=offset)
 
 @router.get("/{redeem_reward_id}", response_model=RedeemRewardResponse, status_code=status.HTTP_200_OK)
 def get_redeem_reward_by_id(

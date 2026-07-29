@@ -11,7 +11,10 @@ from app.utils.get_vn_time import get_vn_now
 
 def get_all_gained_rewards(
     db: Session, 
-    user_id: int) -> List[GainedRewardModel]:
+    user_id: int,
+    limit: Optional[int] = None,
+    offset: int = 0
+) -> List[GainedRewardModel]:
 
     stmt = (
         select(GainedRewardModel)
@@ -19,7 +22,12 @@ def get_all_gained_rewards(
         .options(selectinload(GainedRewardModel.food))
         .order_by(GainedRewardModel.created_at.desc())
     )
-    return list(db.scalars(stmt).unique().all())
+
+    if offset:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    return list(db.scalars(stmt).all())
 
 def create_gained_reward(
     db: Session, 
