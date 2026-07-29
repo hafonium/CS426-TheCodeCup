@@ -6,7 +6,8 @@ from app.schemas.promotion_schema import PromotionCreate
 from app.core.security import get_password_hash, verify_password
 from app.core.exceptions import EmailAlreadyExistsException, PasswordMismatchException, EmailVerificationException
 from app.repositories.promotion_repository import create_promotion
-from app.repositories.otp_repository import get_otp_by_email
+from app.repositories.otp_repository import get_otp_by_email, create_otp
+from app.services.otp_service import send_otp_email
 
 def get_all_users(db: Session) -> list[UserModel]:
     stmt = select(UserModel)
@@ -41,8 +42,8 @@ def create_user(db: Session, user: UserCreate):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-
         create_promotion(db, promotion=PromotionCreate(user_id=db_user.id))
+        return db_user
     except Exception as e:
         db.rollback()
         raise e

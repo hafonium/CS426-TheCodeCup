@@ -1,20 +1,9 @@
-import socket
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.utils import formataddr
-
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from app.core.config import settings
 
 def send_otp_email(otp_code: str, email: str) -> bool:
-    message = MIMEMultipart("alternative")
-    message["Subject"] = "Your Verification Code"
-    sender_name = "The Code Cup"
-    message["From"] = formataddr((sender_name, settings.SENDER_EMAIL))
-    message["To"] = email
-
-    text = f"Your verification code is: {otp_code}. It will expire shortly."
-    html = f"""
+    html_content = f"""
     <html>
       <body>
         <h2>Your Verification Code</h2>
@@ -25,19 +14,23 @@ def send_otp_email(otp_code: str, email: str) -> bool:
     </html>
     """
 
-    message.attach(MIMEText(text, "plain"))
-    message.attach(MIMEText(html, "html"))
-
+    message = Mail(
+        from_email=(settings.SENDER_EMAIL, settings.SENDER_NAME),
+        to_emails=email,
+        subject="Your Verification Code",
+        html_content=html_content
+    )
+    
     try:
-        # Resolve hostname explicitly to IPv4 to prevent IPv6 [Errno 101] in Docker
-        ip_address = socket.gethostbyname(settings.SMTP_SERVER)
+        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        response = sg.send(message)
+        
+        if response.status_code == 202:
+            return True
+        else:
+            print(f"SendGrid returned unexpected status code: {response.status_code}")
+            return False
 
-        with smtplib.SMTP(ip_address, settings.SMTP_PORT, timeout=10) as server:
-            # Pass original hostname for TLS SNI validation
-            server.starttls()
-            server.login(settings.SENDER_EMAIL, settings.SENDER_PASSWORD)
-            server.sendmail(settings.SENDER_EMAIL, email, message.as_string())
-        return True
     except Exception as e:
-        print(f"Failed to send email: {e}")
+        print(f"Failed to send email via SendGrid API: {e}")
         return False
