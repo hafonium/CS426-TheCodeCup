@@ -6,6 +6,7 @@ from app.repositories import user_repository
 from app.api.deps import get_db, get_current_user
 from app.models.user_model import UserModel
 from app.core.exceptions import EmailAlreadyExistsException, PasswordMismatchException, EmailVerificationException
+from app.repositories.otp_repository import get_otp_by_email, create_otp
 from app.services.otp_service import send_otp_email
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -29,8 +30,9 @@ def get_user(user_id: int, db: Session = Depends(get_db)) -> UserResponse:
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        new_user = user_repository.create_user(db, user)
-        send_otp_email(new_user.email)
+        user = user_repository.create_user(db, user)
+        new_otp = create_otp(db, email=user.email)  # Create an OTP for the new user
+        send_otp_email(new_otp.otp_code, user.email)  # Send the OTP email
     except EmailAlreadyExistsException as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except EmailVerificationException as e:
