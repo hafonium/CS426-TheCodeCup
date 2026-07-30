@@ -1,4 +1,4 @@
-# ☕ CS426 — The Code Cup
+# ☕ The Code Cup
 - A modern Android application built for a fictional coffee shop, powered by Clean Architecture and a robust Python FastAPI backend.
 
 - The Code Cup allows users to seamlessly browse menus, place orders, earn reward points, and manage their profiles with a secure, server-authoritative backend.
